@@ -4,10 +4,10 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const user = {
-    username: "testuser",
-    email: "h8TtA@example.com",
-    password: "testpassword",
-    phone: "1234567890",
+    username: "admin",
+    email: "admin@gmail.com",
+    password: "12345678",
+    phone: "12345678900",
     userRole : "admin"
 }
 

@@ -22,20 +22,15 @@ const {
 // POST /api/users/login    → login user and return JWT
 router.post("/login", validateUserLogin, loginUser);
 
-/* ─────────────────────────────────────────────────────────────
-AUTHENTICATED ROUTES  (logged-in users)
-───────────────────────────────────────────────────────────── */
-router.use(protect); // all routes below require valid JWT
-
-
 
 // POST /api/users/register → register new user
-router.post("/register", validateUserRegistration, registerUser);
+router.post("/register",protect, validateUserRegistration, registerUser);
 
 // GET  /api/users/me       → get logged-in user's profile
-// router.get("/me", getMe);
+
+router.get("/me", protect, getMe);
 
 // PUT  /api/users/me       → update logged-in user's profile
-router.put("/update", updateMyProfile);
+router.put("/update", protect, updateMyProfile);
 
 module.exports =()=> router;

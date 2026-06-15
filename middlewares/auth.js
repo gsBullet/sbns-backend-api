@@ -1,4 +1,4 @@
-const jwt      = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const AppError = require("./AppError");
 const { asyncHandler } = require("./asyncHandler");
 
@@ -8,6 +8,7 @@ const { asyncHandler } = require("./asyncHandler");
 /* ─── protect ───────────────────────────────────────────────── */
 // Verifies JWT from Authorization header or cookie
 exports.protect = asyncHandler(async (req, res, next) => {
+  // console.log(`req`, req);
   let token;
 
   // 1) Read token from header or cookie
@@ -23,23 +24,17 @@ exports.protect = asyncHandler(async (req, res, next) => {
   // 2) Verify token
   let decoded;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
+    decoded = await jwt.verify(token, process.env.JWT_SECRET);
+    // console.log(`decode`, decoded);
   } catch {
     throw new AppError("টোকেন অবৈধ বা মেয়াদ শেষ হয়েছে। আবার লগইন করুন।", 401);
   }
 
-  // 3) Check user still exists  ← uncomment after adding User model
-  // const user = await User.findById(decoded.id).select("-password");
-  // if (!user) throw new AppError("এই ব্যবহারকারী আর বিদ্যমান নেই", 401);
-
-  // Temporary: attach decoded payload directly
-  // Replace with `req.user = user` after wiring User model
   req.user = {
-    _id:    decoded.id,
-    name:   decoded.name   || "ব্যবহারকারী",
-    email:  decoded.email  || "",
-    role:   decoded.role   || "user",
-    avatar: decoded.avatar || "👤",
+    _id: decoded._id,
+    username: decoded.username || "ব্যবহারকারী",
+    phone: decoded.phone || "",
+    userRole: decoded.userRole || "user",
   };
 
   next();
@@ -47,9 +42,11 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
 /* ─── restrictTo ─────────────────────────────────────────────── */
 // Usage: restrictTo("admin")  or  restrictTo("admin", "moderator")
-exports.restrictTo = (...roles) => (req, res, next) => {
-  if (!roles.includes(req.user.role)) {
-    return next(new AppError("আপনার এই কাজ করার অনুমতি নেই", 403));
-  }
-  next();
-};
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError("আপনার এই কাজ করার অনুমতি নেই", 403));
+    }
+    next();
+  };

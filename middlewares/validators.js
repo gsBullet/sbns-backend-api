@@ -74,15 +74,15 @@ exports.validatePassword = (req, res, next) => {
 };
 
 exports.validateUserRegistration = (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { username, email, password, phone,userRole } = req.body;
   const errors = [];
 
-  if (!name?.trim())     errors.push("নাম দিন");
+  if (!username?.trim())     errors.push("ব্যবহারকারীর নাম দিন");
   if (!email?.trim())    errors.push("ইমেইল দিন");
   if (!password?.trim()) errors.push("পাসওয়ার্ড দিন");
 
-  if (name && name.trim().length < 3)
-    errors.push("নাম কমপক্ষে ৩ অক্ষর হতে হবে");
+  if (username && username.trim().length < 3)
+    errors.push("ব্যবহারকারীর নাম কমপক্ষে ৩ অক্ষর হতে হবে");
 
   if (password && password.trim().length < 6)
     errors.push("পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে");
