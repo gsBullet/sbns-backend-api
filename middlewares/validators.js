@@ -105,3 +105,79 @@ exports.validateUserLogin = (req, res, next) => {
 
   next();
 };
+
+
+exports.validateGalleryCreation = (req, res, next) => {
+  const { title, description, images } = req.body;
+  const errors = [];
+
+  if (!title?.trim())       errors.push("শিরোনাম দিন");
+  if (!description?.trim()) errors.push("বর্ণনা দিন");
+  if (!images || !Array.isArray(images) || images.length === 0)
+    errors.push("কমপক্ষে একটি ছবি দিন");
+
+  if (title && title.trim().length < 5)
+    errors.push("শিরোনাম কমপক্ষে ৫ অক্ষর হতে হবে");
+
+  if (description && description.trim().length < 10)
+    errors.push("বর্ণনা কমপক্ষে ১০ অক্ষর হতে হবে");
+
+  if (errors.length)
+    return next(new AppError(errors.join(", "), 400));
+
+  next();
+};
+
+exports.validateGalleryUpdate = (req, res, next) => {
+  const { title, description, images } = req.body;
+  const errors = [];
+
+  if (title && title.trim().length < 5)
+    errors.push("শিরোনাম কমপক্ষে ৫ অক্ষর হতে হবে");
+
+  if (description && description.trim().length < 10)
+    errors.push("বর্ণনা কমপক্ষে ১০ অক্ষর হতে হবে");
+
+  if (images && (!Array.isArray(images) || images.length === 0))
+    errors.push("কমপক্ষে একটি ছবি দিন");
+
+  if (errors.length)
+    return next(new AppError(errors.join(", "), 400));
+
+  next();
+};  
+
+exports.validateResponsibilityCreation = (req, res, next) => {
+  const { title, description } = req.body;
+  const errors = [];
+
+  if (!title?.trim())       errors.push("শিরোনাম দিন");
+  if (!description?.trim()) errors.push("বর্ণনা দিন");
+
+  if (title && title.trim().length < 5)
+    errors.push("শিরোনাম কমপক্ষে ৫ অক্ষর হতে হবে");
+
+  if (description && description.trim().length < 10)
+    errors.push("বর্ণনা কমপক্ষে ১০ অক্ষর হতে হবে");
+
+  if (errors.length)
+    return next(new AppError(errors.join(", "), 400));
+
+  next();
+};
+
+exports.validateResponsibilityUpdate = (req, res, next) => {
+  const { title, description } = req.body;
+  const errors = [];
+
+  if (title && title.trim().length < 5)
+    errors.push("শিরোনাম কমপক্ষে ৫ অক্ষর হতে হবে");
+
+  if (description && description.trim().length < 10)
+    errors.push("বর্ণনা কমপক্ষে ১০ অক্ষর হতে হবে");
+
+  if (errors.length)
+    return next(new AppError(errors.join(", "), 400));
+
+  next();
+};  
