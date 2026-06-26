@@ -1,14 +1,10 @@
 const mongoose = require("mongoose");
 
-const GallerySchema = new mongoose.Schema(
+const ResponsibilitySchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: [true, "দায়িত্বের শিরোনাম দিন"],
-      trim: true,
-    },
-    description: {
-      type: String,
       trim: true,
     },
     status: {
@@ -20,4 +16,4 @@ const GallerySchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-module.exports = mongoose.model("Responsibility", GallerySchema);
+module.exports = mongoose.model("responsibilities", ResponsibilitySchema);
