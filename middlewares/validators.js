@@ -170,3 +170,34 @@ exports.validateResponsibilityUpdate = (req, res, next) => {
 
   next();
 };
+
+
+exports.validateMemberCreation = (req, res, next) => {
+  const { name, phone, presentAddress, permanentAddress, profession } = req.body;
+  const errors = [];
+
+  if (!name?.trim()) errors.push("সদস্যের নাম দিন");
+  if (!phone?.trim()) errors.push("ফোন নম্বর দিন");
+  if (!presentAddress?.trim()) errors.push("বর্তমান ঠিকানা দিন");
+  if (!permanentAddress?.trim()) errors.push("স্থায়ী ঠিকানা দিন");
+  if (!profession?.trim()) errors.push("পেশা দিন");
+
+  if (name && name.trim().length < 3)
+    errors.push("সদস্যের নাম কমপক্ষে ৩ অক্ষর হতে হবে");
+
+  if (errors.length) return next(new AppError(errors.join(", "), 400));
+
+  next();
+};
+
+exports.validateMemberUpdate = (req, res, next) => {
+  const { name, phone, presentAddress, permanentAddress, profession } = req.body;
+  const errors = [];  
+
+  if (name && name.trim().length < 3) 
+    errors.push("সদস্যের নাম কমপক্ষে ৩ অক্ষর হতে হবে");
+
+  if (errors.length) return next(new AppError(errors.join(", "), 400));
+
+  next();
+};

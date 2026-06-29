@@ -19,7 +19,7 @@ const {
 ───────────────────────────────────────────────────────────── */
 
 // GET /api/responsibilities → get all responsibilities
-router.get("/all-responsibilities-for-public", getAllResponsibilities);
+router.get("/get-responsibility-for-members", getAllResponsibilities);
 
 // GET /api/responsibilities/:id → get responsibility by ID
 router.get("/responsibility/:id", getResponsibilityById);

@@ -16,4 +16,4 @@ const ResponsibilitySchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-module.exports = mongoose.model("responsibilities", ResponsibilitySchema);
+module.exports = mongoose.model("Responsibilities", ResponsibilitySchema);

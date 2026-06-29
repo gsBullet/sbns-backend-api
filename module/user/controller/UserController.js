@@ -55,7 +55,7 @@ module.exports = {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "720h",
       },
     );
 
