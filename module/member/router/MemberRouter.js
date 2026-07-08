@@ -23,7 +23,7 @@ router.get("/get-all-members", protect, memberController.getAllMembers);
 router.get("/get-member/:id",protect, memberController.getMemberById);
 
 // Update a member by ID
-router.put(
+router.post(
   "/update-member/:id",
   protect,
   validateMemberUpdate,

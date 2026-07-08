@@ -1,5 +1,7 @@
 const { uploadFile } = require("../../../middlewares/updloadHandler");
 const MemberModel = require("../model/MemberModel");
+const path = require("path");
+const fs = require("fs");
 
 module.exports = {
   createMember: async (req, res, next) => {
@@ -92,13 +94,33 @@ module.exports = {
         responsibilities,
       } = req.body;
 
-       // Process image
-      if (req.files?.image) {
-        image = uploadFile(req.files.image, "uploads");
-        console.log("image saved at:", image);
+      // First, find the existing member to get the old image
+      const existingMember = await MemberModel.findById(req.params.id);
+
+      if (!existingMember) {
+        return res.status(404).json({ message: "সদস্য পাওয়া যায়নি" });
       }
 
+      // Declare image variable and set default to existing image
+      let image = existingMember.image;
 
+      // Process new image if provided
+      if (req.files?.image) {
+        // Delete the old image if it exists
+        if (existingMember.image) {
+          const oldImagePath = path.join(__dirname, "..", existingMember.image);
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath);
+            console.log("Old image deleted:", existingMember.image);
+          }
+        }
+
+        // Upload the new image
+        image = uploadFile(req.files.image, "uploads");
+        console.log("New image saved at:", image);
+      }
+
+      // Update the member with new data
       const updatedMember = await MemberModel.findByIdAndUpdate(
         req.params.id,
         {
@@ -108,14 +130,10 @@ module.exports = {
           permanentAddress,
           profession,
           responsibilities,
-          image: image,
+          image: image, // Now image is defined
         },
         { new: true },
       );
-
-      if (!updatedMember) {
-        return res.status(404).json({ message: "সদস্য পাওয়া যায়নি" });
-      }
 
       return res.status(200).json({
         success: true,
@@ -123,24 +141,52 @@ module.exports = {
         member: updatedMember,
       });
     } catch (error) {
+      // If error occurs and new image was uploaded, clean it up
+      if (req.files?.image && image) {
+        const newImagePath = path.join(__dirname, "..", image);
+        if (fs.existsSync(newImagePath)) {
+          fs.unlinkSync(newImagePath);
+        }
+      }
       return res.status(500).json({
         success: false,
         error: error.message,
       });
     }
   },
-
   deleteMember: async (req, res, next) => {
     try {
-      const deletedMember = await MemberModel.findByIdAndDelete(req.params.id);
-      if (!deletedMember) {
+      const member = await MemberModel.findById(req.params.id);
+
+      if (!member) {
         return res.status(404).json({ message: "সদস্য পাওয়া যায়নি" });
       }
+
+      // Delete image if exists
+      if (member.image) {
+        const imagePath = path.join(__dirname, "..", member.image);
+        if (fs.existsSync(imagePath)) {
+          try {
+            fs.unlinkSync(imagePath);
+            console.log("Image deleted successfully:", member.image);
+          } catch (unlinkError) {
+            console.error("Failed to delete image:", unlinkError.message);
+            // Continue with member deletion even if image deletion fails
+          }
+        } else {
+          console.log("Image file not found:", member.image);
+        }
+      }
+
+      // Delete the member
+      await MemberModel.findByIdAndDelete(req.params.id);
+
       return res.status(200).json({
         success: true,
         message: "সদস্য সফলভাবে ডিলিট হয়েছে",
       });
     } catch (error) {
+      console.error("Delete member error:", error);
       return res.status(500).json({
         success: false,
         error: error.message,
