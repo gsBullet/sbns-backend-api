@@ -13,6 +13,7 @@ module.exports = {
         permanentAddress,
         profession,
         responsibilities,
+        organizationalValue,
       } = req.body;
       let image = [];
 
@@ -29,6 +30,7 @@ module.exports = {
         permanentAddress,
         profession,
         responsibilities,
+        organizationalValue,
         image: image,
       });
 
@@ -50,7 +52,11 @@ module.exports = {
 
   getAllMembers: async (req, res, next) => {
     try {
-      const members = await MemberModel.find().populate("responsibilities");
+      const members = await MemberModel.find()
+        .sort({ updatedAt: -1 })
+        .select("-__v")
+        .populate("responsibilities")
+        .exec();
       return res.status(200).json({
         success: true,
         data: members,
@@ -65,9 +71,9 @@ module.exports = {
 
   getMemberById: async (req, res, next) => {
     try {
-      const member = await MemberModel.findById(req.params.id).populate(
-        "responsibilities",
-      );
+      const member = await MemberModel.findById(req.params.id)
+        .populate("responsibilities")
+        .select("-__v"); // Exclude the __v field
       if (!member) {
         return res.status(404).json({ message: "সদস্য পাওয়া যায়নি" });
       }
@@ -92,6 +98,7 @@ module.exports = {
         permanentAddress,
         profession,
         responsibilities,
+        organizationalValue,
       } = req.body;
 
       // First, find the existing member to get the old image
@@ -130,6 +137,7 @@ module.exports = {
           permanentAddress,
           profession,
           responsibilities,
+          organizationalValue,
           image: image, // Now image is defined
         },
         { new: true },
@@ -206,7 +214,7 @@ module.exports = {
       }
       return res.status(200).json({
         success: true,
-        message: "সদস্য সফলভাবে আপডেট হয়েছে",
+        message: "স্টাটাস সফলভাবে আপডেট হয়েছে",
         member: updatedMember,
       });
     } catch (error) {

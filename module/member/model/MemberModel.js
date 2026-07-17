@@ -26,15 +26,18 @@ const memberSchema = new Schema({
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Responsibilities",
   },
+  organizationalValue: {
+    type: String,
+  },
   image: {
     type: String,
     default: "https://via.placeholder.com/150",
   },
   status: {
-    type: String,
-    enum: ["active", "inactive"],
-    default: "active",
+    type: Boolean,
+    enum: [true, false],
+    default: true,
   },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Members", memberSchema);

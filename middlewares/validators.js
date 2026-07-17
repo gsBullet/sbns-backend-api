@@ -201,3 +201,36 @@ exports.validateMemberUpdate = (req, res, next) => {
 
   next();
 };
+
+exports.validateWardManagement = (req, res, next) => {
+  const { wardNumber, chairmanName, viceChairmanName, secretaryName } = req.body;
+  const errors = [];
+
+  if (!wardNumber?.trim()) errors.push("ওয়ার্ড নম্বর দিন");
+  if (!chairmanName?.trim()) errors.push("চেয়ারম্যানের নাম দিন");
+  if (!viceChairmanName?.trim()) errors.push("ভাইস চেয়ারম্যানের নাম দিন");
+  if (!secretaryName?.trim()) errors.push("সচিবের নাম দিন");
+
+  if (wardNumber && wardNumber.trim().length < 1)
+    errors.push("ওয়ার্ড নম্বর কমপক্ষে ১ অক্ষর হতে হবে");
+
+  if (errors.length) return next(new AppError(errors.join(", "), 400));
+
+  next();
+};
+
+exports.validateWardManagementUpdate = (req, res, next) => {
+  const { wardNumber, chairmanName, viceChairmanName, secretaryName } = req.body;
+  const errors = [];
+
+  if (wardNumber && wardNumber.trim().length < 1)
+    errors.push("ওয়ার্ড নম্বর কমপক্ষে ১ অক্ষর হতে হবে");
+
+  if (errors.length) return next(new AppError(errors.join(", "), 400));
+
+  next();
+};
+
+
+
+

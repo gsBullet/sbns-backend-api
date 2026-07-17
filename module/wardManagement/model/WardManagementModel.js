@@ -1,0 +1,38 @@
+const mongoose = require("mongoose");
+const WardManagementSchema = new mongoose.Schema(
+  {
+    wardName: {
+      type: mongoose.Schema.ObjectId,
+      ref: "wards",
+      required: true,
+    },
+    president: {
+      type: mongoose.Schema.ObjectId,
+      ref: "members",
+      required: true,
+    },
+    vicePresident: {
+      type: mongoose.Schema.ObjectId,
+      ref: "members",
+      required: true,
+    },
+    secretary: {
+      type: mongoose.Schema.ObjectId,
+      ref: "members",
+      required: true,
+    },
+    teamMembers: {
+      type: [mongoose.Schema.ObjectId],
+      ref: "members",
+      required: true,
+    },
+    status: {
+      type: Boolean,
+      enum: [true, false],
+      default: true,
+    },
+  },
+  { timestamps: true },
+);
+
+module.exports = mongoose.model("wardManagements", WardManagementSchema);
