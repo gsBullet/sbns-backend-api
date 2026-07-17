@@ -1,0 +1,26 @@
+# http://localhost:5000/api/health
+
+
+
+POST http://localhost:5000/api/user/register
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMmMwZWUzZjI2NzU5MTBhYmQzYzgzMiIsIm5hbWUiOiJhZG1pbiIsInBob25lIjoiMTIzNDU2Nzg5MDAiLCJ1c2VyUm9sZSI6ImFkbWluIiwiaWF0IjoxNzgxMjc0MTQzLCJleHAiOjE3ODEyNzc3NDN9.KlT9VoapDBMuvqpJ3jsZ6zkBTcTK8s_diDPBdcUGXVw
+
+{
+  "username": "kadir",
+  "email": "kadir1@gmail.com",
+  "password": "12345678",
+  "phone": "123456789000",
+  "userRole": "admin"
+}
+
+
+# login 
+
+# POST http://localhost:5000/api/user/login
+# Content-Type: application/json
+
+# {
+#   "email": "admin@gmail.com",
+#   "password": "12345678"
+# }
