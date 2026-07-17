@@ -21,11 +21,12 @@ const WardManagementSchema = new mongoose.Schema(
       ref: "members",
       required: true,
     },
-    teamMembers: {
-      type: [mongoose.Schema.ObjectId],
-      ref: "members",
-      required: true,
-    },
+    teamMembers: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "members",
+      },
+    ],
     status: {
       type: Boolean,
       enum: [true, false],

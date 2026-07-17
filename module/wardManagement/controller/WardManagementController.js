@@ -1,24 +1,17 @@
 const WardManagementModel = require("../model/WardManagementModel");
 
 module.exports = {
-  createWardManagement: async (req, res, next) => {
+  createWardManagement: async (req, res) => {
     try {
-      const { wardName, president, vicePresident, secretary, teamMembers } =
+      let { wardName, president, vicePresident, secretary, teamMembers } =
         req.body;
-      if (
-        !wardName ||
-        !president ||
-        !vicePresident ||
-        !secretary ||
-        !teamMembers
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: "All fields are required",
-        });
+
+      // Convert string to array
+      if (typeof teamMembers === "string") {
+        teamMembers = JSON.parse(teamMembers);
       }
 
-      const wardManagement = await WardManagementModel.createWardManagement({
+      const wardManagement = await WardManagementModel.create({
         wardName,
         president,
         vicePresident,
@@ -26,36 +19,48 @@ module.exports = {
         teamMembers,
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         data: wardManagement,
         message: "Ward management created successfully",
       });
     } catch (error) {
-      next(error);
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   },
-
-  getAllWardManagement: async (req, res, next) => {
+  getAllWardManagement: async (req, res) => {
     try {
-      const wardManagements =
-        await WardManagementService.getAllWardManagement();
-      res.status(200).json({
+      const wardManagements = await WardManagementModel.find()
+        .populate("wardName")
+        .populate("president")
+        .populate("vicePresident")
+        .populate("secretary")
+        .populate("teamMembers");
+
+      return res.status(200).json({
         success: true,
         data: wardManagements,
         message: "Ward managements retrieved successfully",
       });
     } catch (error) {
-      next(error);
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   },
 
   getWardManagementById: async (req, res, next) => {
     try {
-      const wardManagement = await WardManagementService.getWardManagementById(
-        req.params.id,
-      );
-      res.status(200).json({
+      const wardManagement = await WardManagementModel.findById(req.params.id);
+      return res.status(200).json({
         success: true,
         data: wardManagement,
         message: "Ward management retrieved successfully",
@@ -67,11 +72,11 @@ module.exports = {
 
   updateWardManagement: async (req, res, next) => {
     try {
-      const updatedWardManagement =
-        await WardManagementService.updateWardManagement(
-          req.params.id,
-          req.body,
-        );
+      const updatedWardManagement = await WardManagementModel.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true },
+      );
       res.status(200).json({
         success: true,
         data: updatedWardManagement,
@@ -84,8 +89,9 @@ module.exports = {
 
   deleteWardManagement: async (req, res, next) => {
     try {
-      const deletedWardManagement =
-        await WardManagementService.deleteWardManagement(req.params.id);
+      const deletedWardManagement = await WardManagementModel.findByIdAndDelete(
+        req.params.id,
+      );
       res.status(200).json({
         success: true,
         data: deletedWardManagement,
@@ -99,9 +105,10 @@ module.exports = {
   updateWardManagementStatus: async (req, res, next) => {
     try {
       const updatedWardManagementStatus =
-        await WardManagementService.updateWardManagementStatus(
+        await WardManagementModel.findByIdAndUpdate(
           req.params.id,
-          req.body.status,
+          { status: req.body.status },
+          { new: true },
         );
       res.status(200).json({
         success: true,

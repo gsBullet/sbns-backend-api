@@ -171,9 +171,9 @@ exports.validateResponsibilityUpdate = (req, res, next) => {
   next();
 };
 
-
 exports.validateMemberCreation = (req, res, next) => {
-  const { name, phone, presentAddress, permanentAddress, profession } = req.body;
+  const { name, phone, presentAddress, permanentAddress, profession } =
+    req.body;
   const errors = [];
 
   if (!name?.trim()) errors.push("সদস্যের নাম দিন");
@@ -191,10 +191,11 @@ exports.validateMemberCreation = (req, res, next) => {
 };
 
 exports.validateMemberUpdate = (req, res, next) => {
-  const { name, phone, presentAddress, permanentAddress, profession } = req.body;
-  const errors = [];  
+  const { name, phone, presentAddress, permanentAddress, profession } =
+    req.body;
+  const errors = [];
 
-  if (name && name.trim().length < 3) 
+  if (name && name.trim().length < 3)
     errors.push("সদস্যের নাম কমপক্ষে ৩ অক্ষর হতে হবে");
 
   if (errors.length) return next(new AppError(errors.join(", "), 400));
@@ -203,16 +204,14 @@ exports.validateMemberUpdate = (req, res, next) => {
 };
 
 exports.validateWardManagement = (req, res, next) => {
-  const { wardNumber, chairmanName, viceChairmanName, secretaryName } = req.body;
+  const { wardName, president, vicePresident, secretary } =
+    req.body;
   const errors = [];
 
-  if (!wardNumber?.trim()) errors.push("ওয়ার্ড নম্বর দিন");
-  if (!chairmanName?.trim()) errors.push("চেয়ারম্যানের নাম দিন");
-  if (!viceChairmanName?.trim()) errors.push("ভাইস চেয়ারম্যানের নাম দিন");
-  if (!secretaryName?.trim()) errors.push("সচিবের নাম দিন");
-
-  if (wardNumber && wardNumber.trim().length < 1)
-    errors.push("ওয়ার্ড নম্বর কমপক্ষে ১ অক্ষর হতে হবে");
+  if (!wardName?.trim()) errors.push("ওয়ার্ড নাম দিন");
+  if (!president?.trim()) errors.push("চেয়ারম্যানের নাম দিন");
+  if (!vicePresident?.trim()) errors.push("ভাইস চেয়ারম্যানের নাম দিন");
+  if (!secretary?.trim()) errors.push("সচিবের নাম দিন");
 
   if (errors.length) return next(new AppError(errors.join(", "), 400));
 
@@ -220,17 +219,14 @@ exports.validateWardManagement = (req, res, next) => {
 };
 
 exports.validateWardManagementUpdate = (req, res, next) => {
-  const { wardNumber, chairmanName, viceChairmanName, secretaryName } = req.body;
+  const { wardName, president, vicePresident, secretary } =
+    req.body;
   const errors = [];
 
-  if (wardNumber && wardNumber.trim().length < 1)
-    errors.push("ওয়ার্ড নম্বর কমপক্ষে ১ অক্ষর হতে হবে");
+  if (wardName && wardName.trim().length < 3)
+    errors.push("ওয়ার্ড নাম কমপক্ষে ৩ অক্ষর হতে হবে");
 
   if (errors.length) return next(new AppError(errors.join(", "), 400));
 
   next();
 };
-
-
-
-
