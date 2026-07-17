@@ -6,10 +6,6 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-<<<<<<< HEAD
-    "user": "node seeder.js",
-=======
->>>>>>> 590f8f96d6dce72fb145b418c617ef56df881302
     "lint": "eslint ."
   },
   "dependencies": {
