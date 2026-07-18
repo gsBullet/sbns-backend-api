@@ -230,3 +230,16 @@ exports.validateWardManagementUpdate = (req, res, next) => {
 
   next();
 };
+
+exports.unitValidator = (req, res, next) => {
+  const { unitName } = req.body;
+  const errors = [];
+
+  if (!unitName?.trim()) errors.push("ইউনিট নাম দিন");
+  if (unitName && unitName.trim().length < 3)
+    errors.push("ইউনিট নাম কমপক্ষে ৩ অক্ষর হতে হবে");
+
+  if (errors.length) return next(new AppError(errors.join(", "), 400));
+
+  next();
+};
