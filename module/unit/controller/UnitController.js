@@ -3,7 +3,7 @@ const UnitModel = require("../model/UnitModel");
 module.exports = {
   getUnits: async (req, res) => {
     try {
-      const units = await UnitModel.find().sort({ updatedAt: -1 });
+      const units = await UnitModel.find().sort({ createdAt: -1 });
       return res.status(200).json({
         success: true,
         data: units,

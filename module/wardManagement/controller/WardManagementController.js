@@ -54,7 +54,7 @@ module.exports = {
         .populate("treasurer")
         .populate("mediaSecretary")
         .populate("teamMembers")
-        .sort({ updatedAt: -1 })
+        .sort({ createdAt: -1 })
         .exec();
 
       return res.status(200).json({
