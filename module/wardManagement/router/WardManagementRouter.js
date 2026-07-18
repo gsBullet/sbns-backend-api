@@ -21,7 +21,7 @@ router.post(
   WardManagementController.updateWardManagement,
 );
 router.post(
-  "/update-status/:id",
+  "/update-ward-status/:id",
   protect,
   WardManagementController.updateWardManagementStatus,
 );
