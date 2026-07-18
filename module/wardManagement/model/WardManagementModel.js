@@ -21,6 +21,18 @@ const WardManagementSchema = new mongoose.Schema(
       ref: "members",
       required: true,
     },
+    officeSecretary: {
+      type: mongoose.Schema.ObjectId,
+      ref: "members",
+    },
+    treasurer: {
+      type: mongoose.Schema.ObjectId,
+      ref: "members",
+    },
+    mediaSecretary: {
+      type: mongoose.Schema.ObjectId,
+      ref: "members",
+    },
     teamMembers: [
       {
         type: mongoose.Schema.ObjectId,

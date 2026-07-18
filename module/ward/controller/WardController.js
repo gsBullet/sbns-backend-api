@@ -4,13 +4,11 @@ module.exports = {
   createWard: async (req, res) => {
     try {
       const newWard = await WardModel.create(req.body);
-      return res
-        .status(201)
-        .json({
-          success: true,
-          message: "Ward created successfully",
-          data: newWard,
-        });
+      return res.status(201).json({
+        success: true,
+        message: "Ward created successfully",
+        data: newWard,
+      });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -18,7 +16,7 @@ module.exports = {
 
   getWards: async (req, res) => {
     try {
-      const wards = await WardModel.find();
+      const wards = await WardModel.find().sort({ updatedAt: -1 }).exec();
       return res.status(200).json({ success: true, data: wards });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
@@ -51,13 +49,11 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Ward not found" });
       }
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Ward updated successfully",
-          data: updatedWard,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Ward updated successfully",
+        data: updatedWard,
+      });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -90,13 +86,11 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Ward not found" });
       }
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Ward status updated successfully",
-          data: updatedWard,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Ward status updated successfully",
+        data: updatedWard,
+      });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }

@@ -3,8 +3,16 @@ const WardManagementModel = require("../model/WardManagementModel");
 module.exports = {
   createWardManagement: async (req, res) => {
     try {
-      let { wardName, president, vicePresident, secretary, teamMembers } =
-        req.body;
+      let {
+        wardName,
+        president,
+        vicePresident,
+        secretary,
+        officeSecretary,
+        treasurer,
+        mediaSecretary,
+        teamMembers,
+      } = req.body;
 
       // Convert string to array
       if (typeof teamMembers === "string") {
@@ -16,6 +24,9 @@ module.exports = {
         president,
         vicePresident,
         secretary,
+        officeSecretary,
+        treasurer,
+        mediaSecretary,
         teamMembers,
       });
 
@@ -26,7 +37,6 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -40,7 +50,12 @@ module.exports = {
         .populate("president")
         .populate("vicePresident")
         .populate("secretary")
-        .populate("teamMembers");
+        .populate("officeSecretary")
+        .populate("treasurer")
+        .populate("mediaSecretary")
+        .populate("teamMembers")
+        .sort({ updatedAt: -1 })
+        .exec();
 
       return res.status(200).json({
         success: true,
@@ -49,7 +64,6 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-
       return res.status(500).json({
         success: false,
         message: error.message,
@@ -72,8 +86,16 @@ module.exports = {
 
   updateWardManagement: async (req, res, next) => {
     try {
-       let { wardName, president, vicePresident, secretary, teamMembers } =
-        req.body;
+      let {
+        wardName,
+        president,
+        vicePresident,
+        secretary,
+        officeSecretary,
+        treasurer,
+        mediaSecretary,
+        teamMembers,
+      } = req.body;
 
       // Convert string to array
       if (typeof teamMembers === "string") {
@@ -86,17 +108,24 @@ module.exports = {
           president,
           vicePresident,
           secretary,
+          officeSecretary,
+          treasurer,
+          mediaSecretary,
           teamMembers,
         },
         { new: true },
       );
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: updatedWardManagement,
         message: "Ward management updated successfully",
       });
     } catch (error) {
-      next(error);
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   },
 
@@ -105,13 +134,17 @@ module.exports = {
       const deletedWardManagement = await WardManagementModel.findByIdAndDelete(
         req.params.id,
       );
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: deletedWardManagement,
         message: "Ward management deleted successfully",
       });
     } catch (error) {
-      next(error);
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   },
 
@@ -129,7 +162,11 @@ module.exports = {
         message: "Ward management status updated successfully",
       });
     } catch (error) {
-      next(error);
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   },
 };
