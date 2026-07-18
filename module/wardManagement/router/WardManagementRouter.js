@@ -15,7 +15,7 @@ router.post(
 router.get("/list", WardManagementController.getAllWardManagement);
 router.get("/getById/:id", WardManagementController.getWardManagementById);
 router.post(
-  "/update/:id",
+  "/update-ward-management/:id",
   protect,
   validateWardManagementUpdate,
   WardManagementController.updateWardManagement,
@@ -26,7 +26,7 @@ router.post(
   WardManagementController.updateWardManagementStatus,
 );
 router.delete(
-  "/delete/:id",
+  "/delete-ward-management/:id",
   protect,
   WardManagementController.deleteWardManagement,
 );

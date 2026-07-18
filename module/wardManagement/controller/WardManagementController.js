@@ -72,9 +72,22 @@ module.exports = {
 
   updateWardManagement: async (req, res, next) => {
     try {
+       let { wardName, president, vicePresident, secretary, teamMembers } =
+        req.body;
+
+      // Convert string to array
+      if (typeof teamMembers === "string") {
+        teamMembers = JSON.parse(teamMembers);
+      }
       const updatedWardManagement = await WardManagementModel.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        {
+          wardName,
+          president,
+          vicePresident,
+          secretary,
+          teamMembers,
+        },
         { new: true },
       );
       res.status(200).json({
