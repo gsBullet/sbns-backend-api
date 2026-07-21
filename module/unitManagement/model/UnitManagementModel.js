@@ -38,6 +38,10 @@ const WardManagementSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "members",
     },
+    otherSecretaries: {
+      type: [mongoose.Schema.ObjectId],
+      ref: "members",
+    },
     status: {
       type: Boolean,
       enum: [true, false],

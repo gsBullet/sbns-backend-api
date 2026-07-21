@@ -12,11 +12,12 @@ module.exports = {
         officeSecretary,
         treasurer,
         mediaSecretary,
+        otherSecretaries,
       } = req.body;
 
       // Convert string to array
-      if (typeof teamMembers === "string") {
-        teamMembers = JSON.parse(teamMembers);
+      if (typeof otherSecretaries === "string") {
+        otherSecretaries = JSON.parse(otherSecretaries);
       }
 
       const UnitManagement = await UnitManagementModel.create({
@@ -28,6 +29,7 @@ module.exports = {
         officeSecretary,
         treasurer,
         mediaSecretary,
+        otherSecretaries,
       });
 
       return res.status(201).json({
@@ -54,6 +56,7 @@ module.exports = {
         .populate("officeSecretary")
         .populate("treasurer")
         .populate("mediaSecretary")
+        .populate("otherSecretaries")
         .sort({ createdAt: -1 })
         .exec();
 
@@ -95,11 +98,12 @@ module.exports = {
         officeSecretary,
         treasurer,
         mediaSecretary,
+        otherSecretaries,
       } = req.body;
 
       // Convert string to array
-      if (typeof teamMembers === "string") {
-        teamMembers = JSON.parse(teamMembers);
+      if (typeof otherSecretaries === "string") {
+        otherSecretaries = JSON.parse(otherSecretaries);
       }
       const updatedUnitManagement = await UnitManagementModel.findByIdAndUpdate(
         req.params.id,
@@ -112,6 +116,7 @@ module.exports = {
           officeSecretary,
           treasurer,
           mediaSecretary,
+          otherSecretaries,
         },
         { new: true },
       );
