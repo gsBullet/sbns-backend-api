@@ -8,6 +8,7 @@ const MemberRouter = require("./member/router/MemberRouter");
 const WardRouter = require("./ward/router/WardRouter");
 const WardManagementRouter = require("./wardManagement/router/WardManagementRouter");
 const UnitRouter = require("./unit/Router/UnitRouter");
+const UnitManagementRouter = require("./unitManagement/router/UnitManagementRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -16,6 +17,7 @@ router.use("/members", MemberRouter());
 router.use("/wards", WardRouter());
 router.use("/ward-management", WardManagementRouter());
 router.use("/units", UnitRouter());
+router.use("/unit-management", UnitManagementRouter());
 
 module.exports = () => router;
 
