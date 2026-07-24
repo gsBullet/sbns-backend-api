@@ -48,37 +48,52 @@ module.exports = {
   },
   getAllUnitManagement: async (req, res) => {
     try {
-      const UnitManagements = await UnitManagementModel.find()
-        .populate("wardName")
-        .populate("president")
-        .populate("vicePresident")
-        .populate("secretary")
-        .populate("officeSecretary")
-        .populate("treasurer")
-        .populate("mediaSecretary")
-        .populate("otherSecretaries");
-      const wardIds = UnitManagements.filter((unit) => unit.wardName).map(
-        (unit) => unit.wardName._id,
-      );
+      const unitData = await UnitManagementModel.aggregate([
+        {
+          $lookup: {
+            from: "wardmanagements",
+            localField: "wardName",
+            foreignField: "wardName",
+            as: "wardManagement",
+          },
+        },
+        {
+          $unwind: {
+            path: "$wardManagement",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+      ]);
 
-      const wardInfo = await WardManagementModel.find({
-        _id: { $in: wardIds },
-      })
-        .populate("president")
-        .populate("vicePresident")
-        .populate("secretary")
-        .populate("officeSecretary")
-        .populate("treasurer")
-        .populate("mediaSecretary")
-        .populate("teamMembers");
+      // Populate UnitManagement's own top-level ref fields
+      let data = await UnitManagementModel.populate(unitData, [
+        { path: "president" },
+        { path: "vicePresident" },
+        { path: "secretary" },
+        { path: "officeSecretary" },
+        { path: "treasurer" },
+        { path: "mediaSecretary" },
+        { path: "otherSecretaries" },
+        { path: "unitName" },
+        { path: "wardName" },
+      ]);
 
-      console.log(wardInfo);
-
-      console.log(`wardInfo`, wardInfo);
+      // Populate nested wardManagement fields — MUST specify `model` explicitly,
+      // since these came from $lookup and have no schema-based ref info
+      data = await UnitManagementModel.populate(data, [
+        { path: "wardManagement.wardName", model: "wards" }, // adjust model name/ref target as needed
+        { path: "wardManagement.president", model: "members" }, // replace "User" with whatever president refs
+        { path: "wardManagement.vicePresident", model: "members" },
+        { path: "wardManagement.secretary", model: "members" },
+        // { path: "wardManagement.officeSecretary", model: "members" },
+        // { path: "wardManagement.treasurer", model: "members" },
+        // { path: "wardManagement.mediaSecretary", model: "members" },
+        // { path: "wardManagement.teamMembers", model: "members" },
+      ]);
 
       return res.status(200).json({
         success: true,
-        data: UnitManagements,
+        data,
         message: "Unit managements retrieved successfully",
       });
     } catch (error) {
@@ -89,7 +104,6 @@ module.exports = {
       });
     }
   },
-
   getUnitManagementById: async (req, res, next) => {
     try {
       const UnitManagement = await UnitManagementModel.findById(req.params.id);
