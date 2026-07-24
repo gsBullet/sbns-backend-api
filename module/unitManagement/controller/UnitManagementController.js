@@ -1,3 +1,4 @@
+const WardManagementModel = require("../../wardManagement/model/WardManagementModel");
 const UnitManagementModel = require("../model/UnitManagementModel");
 
 module.exports = {
@@ -49,16 +50,31 @@ module.exports = {
     try {
       const UnitManagements = await UnitManagementModel.find()
         .populate("wardName")
-        .populate("unitName")
         .populate("president")
         .populate("vicePresident")
         .populate("secretary")
         .populate("officeSecretary")
         .populate("treasurer")
         .populate("mediaSecretary")
-        .populate("otherSecretaries")
-        .sort({ createdAt: -1 })
-        .exec();
+        .populate("otherSecretaries");
+      const wardIds = UnitManagements.filter((unit) => unit.wardName).map(
+        (unit) => unit.wardName._id,
+      );
+
+      const wardInfo = await WardManagementModel.find({
+        _id: { $in: wardIds },
+      })
+        .populate("president")
+        .populate("vicePresident")
+        .populate("secretary")
+        .populate("officeSecretary")
+        .populate("treasurer")
+        .populate("mediaSecretary")
+        .populate("teamMembers");
+
+      console.log(wardInfo);
+
+      console.log(`wardInfo`, wardInfo);
 
       return res.status(200).json({
         success: true,

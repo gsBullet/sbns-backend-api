@@ -42,12 +42,12 @@ app.use(
   })
 );
 
-// Rate limiting — 100 requests per 15 min per IP
+// Rate limiting — 10000 requests per 15 min per IP
 app.use(
   "/api",
   rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 10000,
     message: {
       success: false,
       message: "অনেক বেশি অনুরোধ। কিছুক্ষণ পরে চেষ্টা করুন।",
