@@ -2,13 +2,14 @@
 const express = require("express");
 const router = express.Router();
 const UserRouter = require("./user/router/User.Router");
-const GalleryRouter = require("./gallery/router/GalleryRouter");
+const GalleryRouter = require("./galleryManagement/gallery/router/GalleryRouter");
 const ResponsibilityRouter = require("./reponsibility/router/ResponsibilityRouter");
 const MemberRouter = require("./member/router/MemberRouter");
 const WardRouter = require("./ward/router/WardRouter");
 const WardManagementRouter = require("./wardManagement/router/WardManagementRouter");
 const UnitRouter = require("./unit/Router/UnitRouter");
 const UnitManagementRouter = require("./unitManagement/router/UnitManagementRouter");
+const GalleryCategoryRouter = require("./galleryManagement/galleryCategory/router/GalleryCategoryRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -18,6 +19,7 @@ router.use("/wards", WardRouter());
 router.use("/ward-management", WardManagementRouter());
 router.use("/units", UnitRouter());
 router.use("/unit-management", UnitManagementRouter());
+router.use("/gallery-category", GalleryCategoryRouter());
 
 module.exports = () => router;
 

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { protect, restrictTo } = require("../../../middlewares/auth");
+const { protect, restrictTo } = require("../../../../middlewares/auth");
 const {
   validateGalleryCreation,
   validateGalleryUpdate,
-} = require("../../../middlewares/validators");
+} = require("../../../../middlewares/validators");
 const {
   createGallery,
   getAllGalleries,

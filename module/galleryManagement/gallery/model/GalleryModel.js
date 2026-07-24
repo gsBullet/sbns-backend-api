@@ -4,7 +4,7 @@ const GallerySchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Gallery title is required"],
+      required: true,
       trim: true,
     },
     description: {
@@ -16,9 +16,9 @@ const GallerySchema = new mongoose.Schema(
         required: true 
     },
     status: {
-      type: String,
-      enum: ["active", "inactive"],
-      default: "active",
+      type: Boolean,
+      enum: [true, false],
+      default: true,
     },
     isFeatured: {
       type: Boolean,
@@ -28,4 +28,4 @@ const GallerySchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-module.exports = mongoose.model("Gallery", GallerySchema);
+module.exports = mongoose.model("gallery", GallerySchema);
