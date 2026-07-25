@@ -6,52 +6,44 @@ const {
   validateGalleryUpdate,
 } = require("../../../../middlewares/validators");
 const {
-  createGallery,
-  getAllGalleries,
-  getAllGalleriesForFeatured,
-  getGalleryById,
-  updateGallery,
-  deleteGallery,
+  createGalleryImage,
+  getAllGalleyImages,
+  getGalleryImageById,
+  updateGalleryImage,
+  deleteGalleryImage,
+  getGalleryImagesForFeatured,
+  updateGalleryImageStatus,
 } = require("../controller/GalleryController");
 
-/* ─────────────────────────────────────────────────────────────
-   PUBLIC ROUTES  (no auth required)
-───────────────────────────────────────────────────────────── */
+router.get("/list", protect, getAllGalleyImages);
 
-// // GET /api/galleries → get all galleries
-router.get("/", getAllGalleries);
+router.get("/:id", protect, getGalleryImageById);
 
-// GET /api/galleries/:id → get gallery by ID
-router.get("/:id", getGalleryById);
-
-/* ─────────────────────────────────────────────────────────────
-   PROTECTED ROUTES (auth required)
-───────────────────────────────────────────────────────────── */
-
-
-
-// POST /api/galleries → create new gallery (admin only)
 router.post(
-  "/",
+  "/create",
   protect,
-  restrictTo("admin"),
+  // restrictTo("admin"),
   validateGalleryCreation,
-  createGallery,
+  createGalleryImage,
 );
 
-// PUT /api/galleries/:id → update gallery by ID (admin only)
-router.put(
+router.post(
   "/:id",
   protect,
-  restrictTo("admin"),
+  // restrictTo("admin"),
   validateGalleryUpdate,
-  updateGallery,
+  updateGalleryImage,
 );
 
-// DELETE /api/galleries/:id → delete gallery by ID (admin only)
-router.delete("/:id", protect, restrictTo("admin"), deleteGallery);
+router.delete(
+  "/delete-gallery/:id",
+  protect,
+  //  restrictTo("admin"),
+  deleteGalleryImage,
+);
 
-// GET /api/galleries/featured → get featured galleries
-router.get("/featured",protect, getAllGalleriesForFeatured);
+router.post("/featured/:id", protect, getGalleryImagesForFeatured);
+
+router.post("/update-gallery-status/:id", protect, updateGalleryImageStatus);
 
 module.exports = () => router;
