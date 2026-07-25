@@ -63,7 +63,7 @@ module.exports = {
     try {
       const updatedGalleryCategory = await GalleryCategoryModel.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        { status: req.body.status },
         { new: true }
       );
       return res.status(200).json({
