@@ -14,9 +14,11 @@ module.exports = {
       return res.status(500).json({ success: false, error: error.message });
     }
   },
-  getAllGalleryCategories:async(req,res) => {
+  getAllGalleryCategories: async (req, res) => {
     try {
-      const galleryCategories = await GalleryCategoryModel.find();
+      const galleryCategories = await GalleryCategoryModel.find().sort({
+        createdAt: -1,
+      });
       return res.status(200).json({
         success: true,
         data: galleryCategories,
@@ -27,13 +29,12 @@ module.exports = {
       return res.status(500).json({ success: false, error: error.message });
     }
   },
-  updateGalleryCategory: async(req,res) => {
+  updateGalleryCategory: async (req, res) => {
     try {
-      const updatedGalleryCategory = await GalleryCategoryModel.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-      );
+      const updatedGalleryCategory =
+        await GalleryCategoryModel.findByIdAndUpdate(req.params.id, req.body, {
+          new: true,
+        });
       return res.status(200).json({
         success: true,
         data: updatedGalleryCategory,
@@ -44,11 +45,10 @@ module.exports = {
       return res.status(500).json({ success: false, error: error.message });
     }
   },
-  deleteGalleryCategory: async(req,res) => {
+  deleteGalleryCategory: async (req, res) => {
     try {
-      const deletedGalleryCategory = await GalleryCategoryModel.findByIdAndDelete(
-        req.params.id
-      );
+      const deletedGalleryCategory =
+        await GalleryCategoryModel.findByIdAndDelete(req.params.id);
       return res.status(200).json({
         success: true,
         data: deletedGalleryCategory,
@@ -59,13 +59,14 @@ module.exports = {
       return res.status(500).json({ success: false, error: error.message });
     }
   },
-  updateGalleryCategoryStatus: async(req,res)=> {
+  updateGalleryCategoryStatus: async (req, res) => {
     try {
-      const updatedGalleryCategory = await GalleryCategoryModel.findByIdAndUpdate(
-        req.params.id,
-        { status: req.body.status },
-        { new: true }
-      );
+      const updatedGalleryCategory =
+        await GalleryCategoryModel.findByIdAndUpdate(
+          req.params.id,
+          { status: req.body.status },
+          { new: true },
+        );
       return res.status(200).json({
         success: true,
         data: updatedGalleryCategory,
