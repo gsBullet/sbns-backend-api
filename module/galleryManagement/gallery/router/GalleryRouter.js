@@ -11,8 +11,9 @@ const {
   getGalleryImageById,
   updateGalleryImage,
   deleteGalleryImage,
-  getGalleryImagesForFeatured,
+  updateGalleryImagesForFeatured,
   updateGalleryImageStatus,
+  getAllGalleyCetogories
 } = require("../controller/GalleryController");
 
 router.get("/list", protect, getAllGalleyImages);
@@ -28,7 +29,7 @@ router.post(
 );
 
 router.post(
-  "/:id",
+  "/update-image/:id",
   protect,
   // restrictTo("admin"),
   validateGalleryUpdate,
@@ -36,14 +37,21 @@ router.post(
 );
 
 router.delete(
-  "/delete-gallery/:id",
+  "/delete-image/:id",
   protect,
   //  restrictTo("admin"),
   deleteGalleryImage,
 );
 
-router.post("/featured/:id", protect, getGalleryImagesForFeatured);
+router.post("/featured/:id", protect, updateGalleryImagesForFeatured);
 
-router.post("/update-gallery-status/:id", protect, updateGalleryImageStatus);
+router.post("/update-image-for-status/:id", protect, updateGalleryImageStatus);
+
+router.get(
+  "/gallery-category/list",
+  protect,
+  // restrictTo("admin"),
+  getAllGalleyCetogories,
+);
 
 module.exports = () => router;

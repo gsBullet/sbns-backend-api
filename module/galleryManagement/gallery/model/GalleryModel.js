@@ -2,27 +2,33 @@ const mongoose = require("mongoose");
 
 const GallerySchema = new mongoose.Schema(
   {
-    title: {
+    caption: {
       type: String,
       required: true,
       trim: true,
+    },
+    category: {
+      type: mongoose.Schema.ObjectId,
+      required: true,
+      ref: "galleryCategories",
     },
     description: {
       type: String,
       trim: true,
     },
-    images: { 
-        type: String, 
-        required: true 
+    image: {
+      type: String,
+      required: true,
+    },
+    isFeatured: {
+      type: Boolean,
+      enum: [true, false],
+      default: false,
     },
     status: {
       type: Boolean,
       enum: [true, false],
       default: true,
-    },
-    isFeatured: {
-      type: Boolean,
-      default: false,
     },
   },
   { timestamps: true },

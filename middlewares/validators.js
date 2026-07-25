@@ -108,15 +108,15 @@ exports.validateUserLogin = (req, res, next) => {
 };
 
 exports.validateGalleryCreation = (req, res, next) => {
-  const { title, description, images } = req.body;
+  const { caption, category, description,  } = req.body;
   const errors = [];
 
-  if (!title?.trim()) errors.push("শিরোনাম দিন");
+  if (!caption?.trim()) errors.push("শিরোনাম দিন");
+  if (!category?.trim()) errors.push("বিভাগ নির্বাচন করুন");
   if (!description?.trim()) errors.push("বর্ণনা দিন");
-  if (!images || !Array.isArray(images) || images.length === 0)
-    errors.push("কমপক্ষে একটি ছবি দিন");
 
-  if (title && title.trim().length < 5)
+
+  if (caption && caption.trim().length < 5)
     errors.push("শিরোনাম কমপক্ষে ৫ অক্ষর হতে হবে");
 
   if (description && description.trim().length < 10)
@@ -128,17 +128,17 @@ exports.validateGalleryCreation = (req, res, next) => {
 };
 
 exports.validateGalleryUpdate = (req, res, next) => {
-  const { title, description, images } = req.body;
+  const { caption, description,category } = req.body;
   const errors = [];
 
-  if (title && title.trim().length < 5)
+  if (caption && caption.trim().length < 5)
     errors.push("শিরোনাম কমপক্ষে ৫ অক্ষর হতে হবে");
 
   if (description && description.trim().length < 10)
     errors.push("বর্ণনা কমপক্ষে ১০ অক্ষর হতে হবে");
 
-  if (images && (!Array.isArray(images) || images.length === 0))
-    errors.push("কমপক্ষে একটি ছবি দিন");
+  if (category && (!Array.isArray(category) || category.length === 0))
+    errors.push("কমপক্ষে একটি ক্যাটেগরি  নির্বাচন করুন");
 
   if (errors.length) return next(new AppError(errors.join(", "), 400));
 
