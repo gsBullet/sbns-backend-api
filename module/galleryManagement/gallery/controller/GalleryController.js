@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { uploadFile } = require("../../../../middlewares/updloadHandler");
 const GalleryCategoryModel = require("../../galleryCategory/model/GalleryCategoryModel");
 const GalleryModel = require("../model/GalleryModel");
@@ -21,13 +22,18 @@ module.exports = {
         caption,
         category,
         description,
-        image: image,
+        image,
         isFeatured,
       });
+
+      const gallery = await GalleryModel.findById(newGallery._id).populate({
+        path: "category",
+        select: "_id categoryName",
+      });
+
       return res.status(201).json({
         success: true,
-        data: newGallery,
-        message: "Gallery created successfully",
+        data: gallery,
       });
     } catch (error) {
       console.log(error);
@@ -36,17 +42,78 @@ module.exports = {
   },
   getAllGalleyImages: async (req, res) => {
     try {
-      const galleries = await GalleryModel.find()
-      .populate("category")
-      .sort({ createdAt: -1 });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const search = req.query.search?.trim() || "";
+      const category = req.query.category?.trim() || "";
+      const rawFilterFeatured = req.query.filterFeatured?.trim() ?? "";
+      const filterFeatured = ["null", "undefined"].includes(rawFilterFeatured)
+        ? ""
+        : rawFilterFeatured;
+
+      const skip = (page - 1) * limit;
+
+      // Validate category ObjectId
+      if (category && !mongoose.Types.ObjectId.isValid(category)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid category id",
+        });
+      }
+
+      const filter = {};
+
+      // Search filter
+      if (search) {
+        filter.$or = [
+          { caption: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+        ];
+      }
+
+      // Category filter
+      if (category) {
+        filter.category = category;
+      }
+
+      // Featured filter
+      if (filterFeatured !== "") {
+        if (filterFeatured === "true") {
+          filter.isFeatured = true;
+        } else if (filterFeatured === "false") {
+          filter.isFeatured = false;
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "filterFeatured must be 'true' or 'false'",
+          });
+        }
+      }
+
+      const [galleries, count] = await Promise.all([
+        GalleryModel.find(filter)
+          .populate("category")
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .exec(),
+        GalleryModel.countDocuments(filter),
+      ]);
+
       return res.status(200).json({
         success: true,
         data: galleries,
+        total: count,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
         message: "Galleries retrieved successfully",
       });
     } catch (error) {
-      console.log(error);
-      return res.status(400).json({ success: false, error: error.message });
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   },
   getGalleryImageById: async (req, res) => {
@@ -175,6 +242,23 @@ module.exports = {
           .json({ success: false, message: "Gallery not found" });
       }
       res.status(200).json({ success: true, data: updatedGallery });
+    } catch (error) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  },
+  updateGalleryFeaturedStatus: async (req, res) => {
+    try {
+      const updatedGalleryFeatured = await GalleryModel.findByIdAndUpdate(
+        req.params.id,
+        { isFeatured: req.body.isFeatured },
+        { new: true },
+      );
+      if (!updatedGalleryFeatured) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Gallery Featured not found" });
+      }
+      res.status(200).json({ success: true, data: updatedGalleryFeatured });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
     }

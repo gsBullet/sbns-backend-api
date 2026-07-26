@@ -13,7 +13,8 @@ const {
   deleteGalleryImage,
   updateGalleryImagesForFeatured,
   updateGalleryImageStatus,
-  getAllGalleyCetogories
+  getAllGalleyCetogories,
+  updateGalleryFeaturedStatus,
 } = require("../controller/GalleryController");
 
 router.get("/list", protect, getAllGalleyImages);
@@ -46,6 +47,7 @@ router.delete(
 router.post("/featured/:id", protect, updateGalleryImagesForFeatured);
 
 router.post("/update-image-for-status/:id", protect, updateGalleryImageStatus);
+router.post("/update-feature-status/:id", protect, updateGalleryFeaturedStatus);
 
 router.get(
   "/gallery-category/list",
