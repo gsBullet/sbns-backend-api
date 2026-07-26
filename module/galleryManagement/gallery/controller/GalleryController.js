@@ -5,7 +5,6 @@ const GalleryModel = require("../model/GalleryModel");
 module.exports = {
   createGalleryImage: async (req, res) => {
     console.log(req.body);
-    // return 0;
 
     try {
       const { caption, description, category, isFeatured } = req.body;
@@ -18,16 +17,13 @@ module.exports = {
         console.log("image saved at:", image);
       }
 
-      const newGallery = await GalleryModel.create(
-        {
-          caption,
-          category,
-          description,
-          image: image,
-          isFeatured,
-        },
-        { new: true },
-      );
+      const newGallery = await GalleryModel.create({
+        caption,
+        category,
+        description,
+        image: image,
+        isFeatured,
+      });
       return res.status(201).json({
         success: true,
         data: newGallery,
@@ -40,7 +36,9 @@ module.exports = {
   },
   getAllGalleyImages: async (req, res) => {
     try {
-      const galleries = await Gallery.find().sort({ createdAt: -1 });
+      const galleries = await GalleryModel.find()
+      .populate("category")
+      .sort({ createdAt: -1 });
       return res.status(200).json({
         success: true,
         data: galleries,
@@ -53,7 +51,7 @@ module.exports = {
   },
   getGalleryImageById: async (req, res) => {
     try {
-      const gallery = await Gallery.findById(req.params.id);
+      const gallery = await GalleryModel.findById(req.params.id);
       if (!gallery) {
         return res
           .status(404)
@@ -126,7 +124,9 @@ module.exports = {
   },
   deleteGalleryImage: async (req, res) => {
     try {
-      const deletedGallery = await Gallery.findByIdAndDelete(req.params.id);
+      const deletedGallery = await GalleryModel.findByIdAndDelete(
+        req.params.id,
+      );
       if (!deletedGallery) {
         return res
           .status(404)
@@ -142,7 +142,7 @@ module.exports = {
   },
   updateGalleryImagesForFeatured: async (req, res) => {
     try {
-      const featuredGalleries = await Gallery.find(
+      const featuredGalleries = await GalleryModel.find(
         req.params.id,
         {
           featured: req.params.featured,
@@ -164,7 +164,7 @@ module.exports = {
 
   updateGalleryImageStatus: async (req, res) => {
     try {
-      const updatedGallery = await Gallery.findByIdAndUpdate(
+      const updatedGallery = await GalleryModel.findByIdAndUpdate(
         req.params.id,
         { status: req.body.status },
         { new: true },

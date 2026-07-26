@@ -15,7 +15,7 @@ const { protect } = require("../../../../middlewares/auth");
 router.post("/create", protect, createGalleryCategory);
 router.get("/list", protect, getAllGalleryCategories);
 router.put("/update-category/:id", protect, updateGalleryCategory);
-router.delete("delete-category/:id", protect, deleteGalleryCategory);
+router.delete("/delete-category/:id", protect, deleteGalleryCategory);
 router.post(
   "/update-category-status/:id",
   protect,
