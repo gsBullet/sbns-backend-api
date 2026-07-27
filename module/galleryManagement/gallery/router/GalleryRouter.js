@@ -46,7 +46,7 @@ router.delete(
 
 router.post("/featured/:id", protect, updateGalleryImagesForFeatured);
 
-router.post("/update-image-for-status/:id", protect, updateGalleryImageStatus);
+router.post("/update-image-gallery-status/:id", protect, updateGalleryImageStatus);
 router.post("/update-feature-status/:id", protect, updateGalleryFeaturedStatus);
 
 router.get(

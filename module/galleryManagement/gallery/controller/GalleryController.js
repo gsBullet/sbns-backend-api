@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const { uploadFile } = require("../../../../middlewares/updloadHandler");
 const GalleryCategoryModel = require("../../galleryCategory/model/GalleryCategoryModel");
 const GalleryModel = require("../model/GalleryModel");
+const path = require("path");
+const fs = require("fs");
 
 module.exports = {
   createGalleryImage: async (req, res) => {
-    console.log(req.body);
-
     try {
       const { caption, description, category, isFeatured } = req.body;
 
@@ -14,7 +14,7 @@ module.exports = {
 
       // Process image
       if (req.files?.image) {
-        image = uploadFile(req.files.image, "uploads");
+        image = await uploadFile(req.files.image, "uploads");
         console.log("image saved at:", image);
       }
 
@@ -135,13 +135,12 @@ module.exports = {
     }
   },
   updateGalleryImage: async (req, res) => {
-    let imagePath = "";
+    let newImagePath = null; // only set if a new file was actually uploaded
 
     try {
       const { caption, description, category, isFeatured } = req.body;
 
       const gallery = await GalleryModel.findById(req.params.id);
-
       if (!gallery) {
         return res.status(404).json({
           success: false,
@@ -149,28 +148,38 @@ module.exports = {
         });
       }
 
-      imagePath = gallery.image;
+      const oldImagePath = gallery.image;
+      let finalImagePath = oldImagePath;
 
+      // Step 1: upload the new image first, don't touch the old one yet
       if (req.files?.image) {
-        if (imagePath) {
-          const oldImage = path.join(__dirname, "..", imagePath);
-          if (fs.existsSync(oldImage)) fs.unlinkSync(oldImage);
-        }
-
-        imagePath = uploadFile(req.files.image, "uploads");
+        finalImagePath = await uploadFile(req.files.image, "uploads");
+        newImagePath = finalImagePath;
+        console.log("image saved at:", newImagePath);
       }
 
-      const updatedGallery = await GalleryModel.findByIdAndUpdate(
+      // Step 2: update the record
+      await GalleryModel.findByIdAndUpdate(req.params.id, {
+        caption,
+        category,
+        description,
+        image: finalImagePath,
+        isFeatured,
+      });
+
+      // Step 3: fetch back populated, same shape as create returns
+      const updatedGallery = await GalleryModel.findById(
         req.params.id,
-        {
-          caption,
-          category,
-          description,
-          image: imagePath,
-          isFeatured,
-        },
-        { new: true },
-      );
+      ).populate({
+        path: "category",
+        select: "_id categoryName",
+      });
+
+      // Step 4: only delete the OLD image once everything above succeeded
+      if (newImagePath && oldImagePath) {
+        const oldImageFullPath = path.join(__dirname, "..", oldImagePath);
+        if (fs.existsSync(oldImageFullPath)) fs.unlinkSync(oldImageFullPath);
+      }
 
       return res.status(200).json({
         success: true,
@@ -178,9 +187,12 @@ module.exports = {
         message: "Gallery updated successfully",
       });
     } catch (error) {
-      if (req.files?.image && imagePath) {
-        const uploadedImage = path.join(__dirname, "..", imagePath);
-        if (fs.existsSync(uploadedImage)) fs.unlinkSync(uploadedImage);
+      console.log(error);
+      // Roll back: only the NEW file, old image is left untouched
+      if (newImagePath) {
+        const uploadedImageFullPath = path.join(__dirname, "..", newImagePath);
+        if (fs.existsSync(uploadedImageFullPath))
+          fs.unlinkSync(uploadedImageFullPath);
       }
 
       return res.status(400).json({
@@ -189,16 +201,25 @@ module.exports = {
       });
     }
   },
+
   deleteGalleryImage: async (req, res) => {
     try {
       const deletedGallery = await GalleryModel.findByIdAndDelete(
         req.params.id,
       );
+
       if (!deletedGallery) {
         return res
           .status(404)
           .json({ success: false, message: "Gallery not found" });
       }
+
+      // Remove the associated image file now that the DB record is gone
+      if (deletedGallery.image) {
+        const imageFullPath = path.join(__dirname, "..", deletedGallery.image);
+        if (fs.existsSync(imageFullPath)) fs.unlinkSync(imageFullPath);
+      }
+
       return res
         .status(200)
         .json({ success: true, message: "Gallery deleted successfully" });
@@ -241,9 +262,13 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Gallery not found" });
       }
-      res.status(200).json({ success: true, data: updatedGallery });
+      return res.status(200).json({
+        success: true,
+        message: "Gallery status updated successfully",
+      });
     } catch (error) {
-      res.status(400).json({ success: false, error: error.message });
+      console.log(error);
+      return res.status(400).json({ success: false, error: error.message });
     }
   },
   updateGalleryFeaturedStatus: async (req, res) => {
@@ -258,9 +283,13 @@ module.exports = {
           .status(404)
           .json({ success: false, message: "Gallery Featured not found" });
       }
-      res.status(200).json({ success: true, data: updatedGalleryFeatured });
+      return res.status(200).json({
+        success: true,
+        message: "Gallery Featured updated successfully",
+      });
     } catch (error) {
-      res.status(400).json({ success: false, error: error.message });
+      console.log(error);
+      return res.status(400).json({ success: false, error: error.message });
     }
   },
 

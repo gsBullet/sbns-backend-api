@@ -137,7 +137,7 @@ exports.validateGalleryUpdate = (req, res, next) => {
   if (description && description.trim().length < 10)
     errors.push("বর্ণনা কমপক্ষে ১০ অক্ষর হতে হবে");
 
-  if (category && (!Array.isArray(category) || category.length === 0))
+  if (!category?.trim())
     errors.push("কমপক্ষে একটি ক্যাটেগরি  নির্বাচন করুন");
 
   if (errors.length) return next(new AppError(errors.join(", "), 400));
