@@ -10,6 +10,7 @@ const WardManagementRouter = require("./wardManagement/router/WardManagementRout
 const UnitRouter = require("./unit/Router/UnitRouter");
 const UnitManagementRouter = require("./unitManagement/router/UnitManagementRouter");
 const GalleryCategoryRouter = require("./galleryManagement/galleryCategory/router/GalleryCategoryRouter");
+const VideoCategoryRouter = require("./videoManagement/videoCategory/router/VideoCategoryRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -20,6 +21,8 @@ router.use("/ward-management", WardManagementRouter());
 router.use("/units", UnitRouter());
 router.use("/unit-management", UnitManagementRouter());
 router.use("/gallery-category", GalleryCategoryRouter());
+router.use("/video-category", VideoCategoryRouter());
+
 
 module.exports = () => router;
 
