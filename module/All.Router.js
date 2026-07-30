@@ -11,6 +11,7 @@ const UnitRouter = require("./unit/Router/UnitRouter");
 const UnitManagementRouter = require("./unitManagement/router/UnitManagementRouter");
 const GalleryCategoryRouter = require("./galleryManagement/galleryCategory/router/GalleryCategoryRouter");
 const VideoCategoryRouter = require("./videoManagement/videoCategory/router/VideoCategoryRouter");
+const VideoRouter = require("./videoManagement/video/router/VideoRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -22,6 +23,7 @@ router.use("/units", UnitRouter());
 router.use("/unit-management", UnitManagementRouter());
 router.use("/gallery-category", GalleryCategoryRouter());
 router.use("/video-category", VideoCategoryRouter());
+router.use("/video", VideoRouter());
 
 
 module.exports = () => router;
