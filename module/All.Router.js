@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 const UserRouter = require("./user/router/User.Router");
@@ -13,6 +12,7 @@ const GalleryCategoryRouter = require("./galleryManagement/galleryCategory/route
 const VideoCategoryRouter = require("./videoManagement/videoCategory/router/VideoCategoryRouter");
 const VideoRouter = require("./videoManagement/video/router/VideoRouter");
 const BlogCategoryRouter = require("./blogManagement/blogCategory/router/BlogCategoryRouter");
+const BlogImageRouter = require("./blogManagement/blog/router/BlogImageRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -25,8 +25,7 @@ router.use("/unit-management", UnitManagementRouter());
 router.use("/gallery-category", GalleryCategoryRouter());
 router.use("/video-category", VideoCategoryRouter());
 router.use("/video", VideoRouter());
-router.use ("/blog/blog-category", BlogCategoryRouter());
-
+router.use("/blog/blog-category", BlogCategoryRouter());
+router.use("/blog/blog-image", BlogImageRouter());
 
 module.exports = () => router;
-
