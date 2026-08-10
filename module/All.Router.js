@@ -13,6 +13,7 @@ const VideoCategoryRouter = require("./videoManagement/videoCategory/router/Vide
 const VideoRouter = require("./videoManagement/video/router/VideoRouter");
 const BlogCategoryRouter = require("./blogManagement/blogCategory/router/BlogCategoryRouter");
 const BlogImageRouter = require("./blogManagement/blog/router/BlogImageRouter");
+const BlogRouter = require("./blogManagement/blog/router/BlogRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -27,5 +28,6 @@ router.use("/video-category", VideoCategoryRouter());
 router.use("/video", VideoRouter());
 router.use("/blog/blog-category", BlogCategoryRouter());
 router.use("/blog/blog-image", BlogImageRouter());
+router.use("/blog", BlogRouter());
 
 module.exports = () => router;
