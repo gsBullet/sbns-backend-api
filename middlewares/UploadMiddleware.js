@@ -6,14 +6,24 @@ const ensureDir = (dir) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 };
 
-const IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
+const IMAGE_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+];
 
 const fileFilter = (req, file, cb) => {
   if (IMAGE_MIME_TYPES.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files (jpeg, png, webp, gif, svg) are allowed"), false);
+    return cb(null, true);
   }
+  // Drain the rejected file's stream so the request doesn't hang/abort
+  file.stream?.resume?.();
+  cb(new multer.MulterError(
+    "LIMIT_UNEXPECTED_FILE",
+    `Only image files (jpeg, png, webp, gif, svg) are allowed. Got: ${file.mimetype}`
+  ));
 };
 
 const makeStorage = (subfolder) => {
@@ -30,18 +40,16 @@ const makeStorage = (subfolder) => {
   });
 };
 
-// For the blog thumbnail (used on create/update blog)
 const uploadThumbnail = multer({
   storage: makeStorage("thumbnails"),
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// For EditorJS inline content images (image tool uploader.uploadByFile)
 const uploadBlogContentImage = multer({
   storage: makeStorage("blogs"),
   fileFilter,
-  limits: { fileSize: 8 * 1024 * 1024 }, // 8MB
+  limits: { fileSize: 8 * 1024 * 1024 },
 });
 
 module.exports = { uploadThumbnail, uploadBlogContentImage };

@@ -2,8 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const Blog = require("../model/BlogModel");
-const { generateUniqueSlug } = require("../utils/slugify");
 const BlogCategoryModel = require("../../blogCategory/model/BlogCategoryModel");
+const { generateUniqueSlug } = require("../utils/Slugify");
+
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000/";
 
@@ -38,6 +39,7 @@ const removeFileByUrl = (url) => {
 /* CREATE                                                              */
 /* ------------------------------------------------------------------ */
 const createBlog = async (req, res) => {
+  console.log("createBlog called with body:", req.body);
   try {
     const { title } = req.body;
     const categories = parseIfString(req.body.categories, []);
