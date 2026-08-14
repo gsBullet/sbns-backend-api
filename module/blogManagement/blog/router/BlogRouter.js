@@ -9,38 +9,29 @@ const {
   deleteBlog,
   uploadImage,
   getAllBlogsCategory,
-  updateBlogStatus
+  updateBlogStatus,
+  isPublishedBlog,
+  uploadThumbnailByCoverImage,
 } = require("../controller/BlogController");
 
-const { uploadThumbnail, uploadBlogContentImage } = require("../../../../middlewares/UploadMiddleware");
-const {protect} = require("../../../../middlewares/auth");
 
-
-// router.post("/upload-image", uploadBlogContentImage.single("image"), uploadImage);
+const { protect } = require("../../../../middlewares/auth");
 
 // CRUD
 router.post(
-  "/create",
+  "/upload-thumbnail-for-cover",
   protect,
-  (req, res, next) => {
-    uploadThumbnail.single("thumbnail")(req, res, (err) => {
-      if (err) {
-        console.error("MULTER ERROR:", err.code, err.message);
-        return res.status(400).json({ success: false, message: err.message });
-      }
-      next();
-    });
-  },
-  createBlog
+  uploadThumbnailByCoverImage,
 );
+router.post("/create", protect, createBlog);
 router.get("/blog-list", protect, getAllBlogs);
 router.get("/:idOrSlug", protect, getBlogByIdOrSlug);
-router.post("/update-blog/:id", protect, uploadThumbnail.single("thumbnail"), updateBlog);
+router.post("/update-blog/:id", protect, updateBlog);
 router.delete("/delete-blog/:id", protect, deleteBlog);
 router.post("/update-blog-status/:id", protect, updateBlogStatus);
-
+router.get("/blog-is-published/:id", protect, isPublishedBlog);
 
 // blog category for blog management
 router.get("/blog-category/list", protect, getAllBlogsCategory);
 
-module.exports =()=> router;
+module.exports = () => router;

@@ -1,10 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
-const Blog = require("../model/BlogModel");
+const BlogModel = require("../model/BlogModel");
 const BlogCategoryModel = require("../../blogCategory/model/BlogCategoryModel");
 const { generateUniqueSlug } = require("../utils/Slugify");
-
+const { uploadFile } = require("../../../../middlewares/UploadThumbnails");
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000/";
 
@@ -35,13 +35,34 @@ const removeFileByUrl = (url) => {
   }
 };
 
+const uploadThumbnailByCoverImage = async (req, res) => {
+  try {
+    let thumbnail = [];
+
+    // Process image
+    if (req.files?.thumbnail) {
+      thumbnail = uploadFile(req.files.thumbnail, "uploads/thumbnails");
+      console.log("thumbnail saved at:", thumbnail);
+    }
+    return res.status(200).json({
+      success: true,
+      data: thumbnail,
+      message: "Thumbnail uploaded successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 /* ------------------------------------------------------------------ */
 /* CREATE                                                              */
 /* ------------------------------------------------------------------ */
+
 const createBlog = async (req, res) => {
   console.log("createBlog called with body:", req.body);
   try {
-    const { title } = req.body;
+    const { title, thumbnail } = req.body;
     const categories = parseIfString(req.body.categories, []);
     const tags = parseIfString(req.body.tags, []);
     const content = parseIfString(req.body.content, null);
@@ -51,11 +72,7 @@ const createBlog = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Blog title cannot be empty!" });
     }
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Please upload a thumbnail!" });
-    }
+
     if (!Array.isArray(categories) || categories.length === 0) {
       return res.status(400).json({
         success: false,
@@ -78,12 +95,11 @@ const createBlog = async (req, res) => {
     }
 
     const slug = await generateUniqueSlug(title);
-    const thumbnailUrl = toPublicUrl("thumbnails", req.file.filename);
 
-    const blog = await Blog.create({
+    const blog = await BlogModel.create({
       title: title.trim(),
       slug,
-      thumbnail: thumbnailUrl,
+      thumbnail,
       categories,
       tags,
       content,
@@ -92,12 +108,13 @@ const createBlog = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Blog published successfully!",
+      message: "Blog Created successfully!",
       data: blog,
     });
   } catch (error) {
     // Clean up the orphaned thumbnail if DB insert failed
-    if (req.file) removeFileByUrl(toPublicUrl("thumbnails", req.file.filename));
+    if (req.files?.thumbnail)
+      removeFileByUrl(toPublicUrl("thumbnails", req.files.thumbnail.filename));
     console.error("createBlog error:", error);
     return res.status(500).json({
       success: false,
@@ -112,26 +129,69 @@ const createBlog = async (req, res) => {
 /* ------------------------------------------------------------------ */
 const getAllBlogs = async (req, res) => {
   try {
-    const { page = 1, limit = 10, category, tag, search, status } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      category,
+      tag,
+      search,
+      status,
+      isPublished,
+    } = req.query;
 
     const filter = {};
-    if (category) filter.categories = category;
-    if (tag) filter.tags = tag.toLowerCase();
-    if (status) filter.status = status;
-    if (search) filter.$text = { $search: search };
+
+    // Category filter
+    // category না থাকলে কোনো category filter হবে না
+    if (category && category !== "null" && category !== "undefined") {
+      filter.categories = category;
+    }
+
+    // Tag filter
+    if (tag && tag !== "null" && tag !== "undefined") {
+      filter.tags = tag.toLowerCase();
+    }
+
+    // Published filter
+    if (
+      isPublished !== undefined &&
+      isPublished !== null &&
+      isPublished !== "" &&
+      isPublished !== "null" &&
+      isPublished !== "undefined"
+    ) {
+      filter.isPublished = isPublished === "true";
+    }
+
+    // Status filter
+    if (status && status !== "null" && status !== "undefined") {
+      filter.status = status;
+    }
+
+    // Search filter
+    if (search && search.trim() !== "") {
+      filter.$text = {
+        $search: search.trim(),
+      };
+    }
 
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
     const limitNum = Math.max(parseInt(limit, 10) || 10, 1);
 
-    const [blogs, total] = await Promise.all([
-      Blog.find(filter)
-        .sort({ createdAt: -1 })
-        .skip((pageNum - 1) * limitNum)
-        .limit(limitNum)
-        .populate("author", "name email"),
-      Blog.countDocuments(filter),
-    ]);
+    const skip = (pageNum - 1) * limitNum;
 
+    const [blogs, total] = await Promise.all([
+    await BlogModel.find()
+        .populate("author", "username")
+        .populate("categories", "blogCategoryName")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean()
+        .exec(),
+
+    await  BlogModel.countDocuments(),
+    ]);
     return res.status(200).json({
       success: true,
       data: blogs,
@@ -144,6 +204,7 @@ const getAllBlogs = async (req, res) => {
     });
   } catch (error) {
     console.error("getAllBlogs error:", error);
+
     return res.status(500).json({
       success: false,
       message: "Failed to fetch blogs",
@@ -162,11 +223,13 @@ const getBlogByIdOrSlug = async (req, res) => {
       ? { _id: idOrSlug }
       : { slug: idOrSlug };
 
-    const blog = await Blog.findOneAndUpdate(
+    const blog = await BlogModel.findOneAndUpdate(
       query,
       { $inc: { views: 1 } },
       { new: true },
-    ).populate("author", "name email");
+    )
+      .populate("author", "username")
+      .populate("categories", "blogCategoryName");
 
     if (!blog) {
       return res
@@ -198,7 +261,7 @@ const updateBlog = async (req, res) => {
         .json({ success: false, message: "Invalid blog id" });
     }
 
-    const existing = await Blog.findById(id);
+    const existing = await BlogModel.findById(id);
     if (!existing) {
       return res
         .status(404)
@@ -256,7 +319,7 @@ const updateBlog = async (req, res) => {
       updates.thumbnail = toPublicUrl("thumbnails", req.file.filename);
     }
 
-    const blog = await Blog.findByIdAndUpdate(id, updates, {
+    const blog = await BlogModel.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
     });
@@ -293,7 +356,7 @@ const deleteBlog = async (req, res) => {
         .json({ success: false, message: "Invalid blog id" });
     }
 
-    const blog = await Blog.findByIdAndDelete(id);
+    const blog = await BlogModel.findByIdAndDelete(id);
     if (!blog) {
       return res
         .status(404)
@@ -349,7 +412,7 @@ const updateBlogStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const updatedBlog = await Blog.findByIdAndUpdate(
+    const updatedBlog = await BlogModel.findByIdAndUpdate(
       id,
       { status },
       { new: true },
@@ -371,6 +434,35 @@ const updateBlogStatus = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to update blog status",
+      error: error.message,
+    });
+  }
+};
+
+const isPublishedBlog = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isPublished } = req.query;
+    const blog = await BlogModel.findById(id);
+    if (!blog) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Blog not found" });
+    }
+    if (isPublished !== undefined) {
+      blog.isPublished = isPublished;
+      await blog.save();
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Blog status fetched successfully!",
+      data: blog,
+    });
+  } catch (error) {
+    console.error("isPublishedBlog error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch blog status",
       error: error.message,
     });
   }
@@ -403,4 +495,6 @@ module.exports = {
   uploadImage,
   updateBlogStatus,
   getAllBlogsCategory,
+  uploadThumbnailByCoverImage,
+  isPublishedBlog,
 };

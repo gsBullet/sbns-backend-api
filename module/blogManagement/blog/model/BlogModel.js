@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-
 const editorContentSchema = new Schema(
   {
     time: { type: Number },
     version: { type: String },
     blocks: { type: Array, default: [] },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const blogSchema = new Schema(
@@ -30,17 +29,14 @@ const blogSchema = new Schema(
     },
 
     thumbnail: {
-      type: String, // stored relative/absolute URL path
+      type: String,
       required: [true, "Thumbnail is required"],
     },
 
     categories: {
-      type: [String],
+      type: [Schema.Types.ObjectId],
       required: true,
-      validate: {
-        validator: (arr) => Array.isArray(arr) && arr.length > 0,
-        message: "At least one category is required",
-      },
+      ref: "blogcategories",
     },
 
     tags: {
@@ -53,20 +49,25 @@ const blogSchema = new Schema(
       type: editorContentSchema,
       required: [true, "Blog content is required"],
       validate: {
-        validator: (val) => val && Array.isArray(val.blocks) && val.blocks.length > 0,
+        validator: (val) =>
+          val && Array.isArray(val.blocks) && val.blocks.length > 0,
         message: "Blog content cannot be empty",
       },
     },
-
     author: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "users",
+    },
+    isPublished: {
+      type: String,
+      enum: ["draft", "published", "pending", ],
+      default: "pending",
     },
 
     status: {
-      type: String,
-      enum: ["draft", "published"],
-      default: "published",
+      type: Boolean,
+      enum: [true, false],
+      default: true,
     },
 
     views: {
@@ -74,7 +75,7 @@ const blogSchema = new Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 blogSchema.index({ title: "text", tags: "text" });
