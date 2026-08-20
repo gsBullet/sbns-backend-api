@@ -1,18 +1,14 @@
 const BlogModel = require("../model/BlogModel");
 
-const baseSlugify = (text) =>
-  text
-    .toString()
+const baseSlugify = (text = "") =>
+  String(text)
     .trim()
     .toLowerCase()
-    .replace(/[^\w\s-]/g, "") // remove non-word chars
-    .replace(/[\s_-]+/g, "-") // collapse whitespace/underscores to single dash
-    .replace(/^-+|-+$/g, ""); // trim leading/trailing dashes
+    .replace(/[^\p{L}\p{N}\s-]/gu, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
-/**
- * Generates a unique slug, appending -1, -2, etc. if a collision exists.
- * Pass excludeId when updating an existing blog so it doesn't collide with itself.
- */
+
 const generateUniqueSlug = async (title, excludeId = null) => {
   const base = baseSlugify(title);
   let slug = base;

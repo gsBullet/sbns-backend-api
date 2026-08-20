@@ -7,7 +7,7 @@ module.exports = {
       const newCategory = await BlogCategoryModel.create({ blogCategoryName });
       return res.status(201).json({
         success: true,
-        message: "ব্লগ ক্যাটেগরি সফলভাবে তৈরি হয়েছে।",
+        message: "Blog category created successfully.",
         data: newCategory,
       });
     } catch (error) {
@@ -21,7 +21,7 @@ module.exports = {
       const blogCategories = await BlogCategoryModel.find().sort({ createdAt: -1 });
       return res.status(200).json({
         success: true,
-        message: "ব্লগ ক্যাটেগরি সফলভাবে প্রদর্শিত হয়েছে।",
+        message: "Blog categories fetched successfully.",
         data: blogCategories,
       });
     } catch (error) {
@@ -44,13 +44,13 @@ module.exports = {
       if (!updatedCategory) {
         return res.status(404).json({
           success: false,
-          message: "ব্লগ ক্যাটেগরি পাওয়া যায়নি।",
+          message: "Blog category not found.",
         });
       }
 
       return res.status(200).json({
         success: true,
-        message: "ব্লগ ক্যাটেগরি সফলভাবে আপডেট হয়েছে।",
+        message: "Blog category updated successfully.",
         data: updatedCategory,
       });
     } catch (error) {
@@ -66,12 +66,12 @@ module.exports = {
       if (!deletedCategory) {
         return res.status(404).json({
           success: false,
-          message: "ব্লগ ক্যাটেগরি পাওয়া যায়নি।",
+          message: "Blog category not found.",
         });
       }
       return res.status(200).json({
         success: true,
-        message: "ব্লগ ক্যাটেগরি সফলভাবে ডিলিট হয়েছে।",
+        message: "Blog category deleted successfully.",
         data: deletedCategory,
       });
     } catch (error) {
@@ -94,13 +94,13 @@ module.exports = {
       if (!updatedCategory) {
         return res.status(404).json({
           success: false,
-          message: "ব্লগ ক্যাটেগরি পাওয়া যায়নি।",
+          message: "Blog category not found.",
         });
       }
 
       return res.status(200).json({
         success: true,
-        message: "ব্লগ ক্যাটেগরি স্ট্যাটাস সফলভাবে আপডেট হয়েছে।",
+        message: "Blog category status updated successfully.",
         data: updatedCategory,
       });
     } catch (error) {

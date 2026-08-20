@@ -26,7 +26,7 @@ router.use("/unit-management", UnitManagementRouter());
 router.use("/gallery-category", GalleryCategoryRouter());
 router.use("/video-category", VideoCategoryRouter());
 router.use("/video", VideoRouter());
-router.use("/blog/blog-category", BlogCategoryRouter());
+router.use("/blog-category", BlogCategoryRouter());
 router.use("/blog/blog-image", BlogImageRouter());
 router.use("/blog", BlogRouter());
 

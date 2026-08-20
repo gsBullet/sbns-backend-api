@@ -8,7 +8,7 @@ const {
   updateBlog,
   deleteBlog,
   uploadImage,
-  getAllBlogsCategory,
+    getAllBlogsCategoryForBlog,
   updateBlogStatus,
   isPublishedBlog,
   uploadThumbnailByCoverImage,
@@ -32,6 +32,6 @@ router.post("/update-blog-status/:id", protect, updateBlogStatus);
 router.get("/blog-is-published/:id", protect, isPublishedBlog);
 
 // blog category for blog management
-router.get("/blog-category/list", protect, getAllBlogsCategory);
+router.get("/blog-category/list", protect, getAllBlogsCategoryForBlog);
 
 module.exports = () => router;

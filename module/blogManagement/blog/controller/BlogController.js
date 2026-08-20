@@ -60,12 +60,13 @@ const uploadThumbnailByCoverImage = async (req, res) => {
 /* ------------------------------------------------------------------ */
 
 const createBlog = async (req, res) => {
-  console.log("createBlog called with body:", req.body);
+  // console.log("createBlog called with body:", req.body);
   try {
     const { title, thumbnail } = req.body;
     const categories = parseIfString(req.body.categories, []);
     const tags = parseIfString(req.body.tags, []);
     const content = parseIfString(req.body.content, null);
+     const isDraft = req.body.isDraft === 'true' || req.body.isDraft === true;
 
     if (!title || !title.trim()) {
       return res
@@ -95,6 +96,8 @@ const createBlog = async (req, res) => {
     }
 
     const slug = await generateUniqueSlug(title);
+    console.log(slug);
+    
 
     const blog = await BlogModel.create({
       title: title.trim(),
@@ -103,18 +106,19 @@ const createBlog = async (req, res) => {
       categories,
       tags,
       content,
+      isDraft : isDraft ? true : false,
       author: req.user?._id, // set by your auth middleware, if present
     });
 
     return res.status(201).json({
       success: true,
-      message: "Blog Created successfully!",
+      message: isDraft ? "Blog saved as draft successfully!" : "Blog Created successfully!",
       data: blog,
     });
   } catch (error) {
     // Clean up the orphaned thumbnail if DB insert failed
     if (req.files?.thumbnail)
-      removeFileByUrl(toPublicUrl("thumbnails", req.files.thumbnail.filename));
+     await removeFileByUrl(toPublicUrl("thumbnails", req.files.thumbnail.filename));
     console.error("createBlog error:", error);
     return res.status(500).json({
       success: false,
@@ -181,7 +185,7 @@ const getAllBlogs = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     const [blogs, total] = await Promise.all([
-    await BlogModel.find()
+      await BlogModel.find()
         .populate("author", "username")
         .populate("categories", "blogCategoryName")
         .sort({ createdAt: -1 })
@@ -190,7 +194,7 @@ const getAllBlogs = async (req, res) => {
         .lean()
         .exec(),
 
-    await  BlogModel.countDocuments(),
+      await BlogModel.countDocuments(),
     ]);
     return res.status(200).json({
       success: true,
@@ -468,16 +472,19 @@ const isPublishedBlog = async (req, res) => {
   }
 };
 
-const getAllBlogsCategory = async (req, res) => {
+const getAllBlogsCategoryForBlog = async (req, res) => {
   try {
-    const blogCategories = await BlogCategoryModel.find({ status: true })
-      .sort({
-        createdAt: -1,
-      })
-      .select("_id blogCategoryName");
+      const blogCategories = await BlogCategoryModel.find({ status: true })
+        .sort({
+          createdAt: -1,
+        })
+        .select("_id blogCategoryName status")
+        .lean();
+
+      // console.log("Active categories:", blogCategories);
     return res.status(200).json({
       success: true,
-      message: "ব্লগ ক্যাটেগরি সফলভাবে প্রদর্শিত হয়েছে।",
+      message: "Blog categories for create blog fetched successfully.",
       data: blogCategories,
     });
   } catch (error) {
@@ -494,7 +501,7 @@ module.exports = {
   deleteBlog,
   uploadImage,
   updateBlogStatus,
-  getAllBlogsCategory,
+  getAllBlogsCategoryForBlog,
   uploadThumbnailByCoverImage,
   isPublishedBlog,
 };
