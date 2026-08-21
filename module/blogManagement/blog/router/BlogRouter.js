@@ -12,6 +12,7 @@ const {
   updateBlogStatus,
   isPublishedBlog,
   uploadThumbnailByCoverImage,
+  updatePublishDraftStatus,
 } = require("../controller/BlogController");
 
 
@@ -33,5 +34,8 @@ router.get("/blog-is-published/:id", protect, isPublishedBlog);
 
 // blog category for blog management
 router.get("/blog-category/list", protect, getAllBlogsCategoryForBlog);
+
+// blog publish draft
+router.get("/publish-draft-status/:id", protect, updatePublishDraftStatus);
 
 module.exports = () => router;

@@ -60,7 +60,7 @@ const blogSchema = new Schema(
     },
     isPublished: {
       type: String,
-      enum: ["draft", "published", "pending", ],
+      enum: ["published", "pending"],
       default: "pending",
     },
 

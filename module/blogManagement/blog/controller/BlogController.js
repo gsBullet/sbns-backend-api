@@ -323,6 +323,11 @@ const updateBlog = async (req, res) => {
       updates.thumbnail = toPublicUrl("thumbnails", req.file.filename);
     }
 
+    if(req.body.isDraft === 'true' || req.body.isDraft === true) {
+      updates.isDraft = true
+      updates.isPublished = 'pending'
+    }
+
     const blog = await BlogModel.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
@@ -493,6 +498,39 @@ const getAllBlogsCategoryForBlog = async (req, res) => {
   }
 };
 
+// controller for POST /blog/publish/:id
+const updatePublishDraftStatus = async (req, res) => {
+  try {
+    const blog = await BlogModel.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).json({ success: false, message: "Blog not found" });
+    }
+
+    if (blog.isDraft) {
+      // Step 1: exit draft mode
+      blog.isDraft = false;
+    } else if (blog.isPublished === "pending") {
+      // Step 2: publish
+      blog.isPublished = "published";
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "This blog is already published",
+      });
+    }
+
+    await blog.save();
+
+    return res.status(200).json({
+      success: true,
+      message: blog.isPublished === "published" ? "Blog published" : "Draft exited",
+      data: blog,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   createBlog,
   getAllBlogs,
@@ -504,4 +542,5 @@ module.exports = {
   getAllBlogsCategoryForBlog,
   uploadThumbnailByCoverImage,
   isPublishedBlog,
+  updatePublishDraftStatus,
 };
