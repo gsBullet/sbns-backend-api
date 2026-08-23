@@ -15,6 +15,8 @@ const BlogCategoryRouter = require("./blogManagement/blogCategory/router/BlogCat
 const BlogImageRouter = require("./blogManagement/blog/router/BlogImageRouter");
 const BlogRouter = require("./blogManagement/blog/router/BlogRouter");
 const HeroBannerRouter = require("./heroBanner/router/HeroBannerRouter");
+const FrontViewRouter = require("./website/FrontViewRouter");
+const CounterRouter = require("./ManpowerCount/Router/CounterRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -31,5 +33,7 @@ router.use("/blog-category", BlogCategoryRouter());
 router.use("/blog/blog-image", BlogImageRouter());
 router.use("/blog", BlogRouter());
 router.use("/hero-banner", HeroBannerRouter());
+router.use("/sbns-counter", CounterRouter());
+router.use("/front-view", FrontViewRouter())
 
 module.exports = () => router;
