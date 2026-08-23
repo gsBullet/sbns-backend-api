@@ -1,9 +1,10 @@
-const CouterModel = require("../model/CouterModel");
+const CounterModel = require("../model/CounterModel");
+
 
 module.exports = {
   getCounters: async (req, res) => {
     try {
-      const counters = await CouterModel.find().sort({ createdAt: -1 });
+      const counters = await CounterModel.find().sort({ createdAt: -1 });
       return res.status(200).json({
         success: true,
         data: counters,
@@ -19,7 +20,7 @@ module.exports = {
   },
   createCounter: async (req, res) => {
     try {
-      const counter = await CouterModel.create(req.body);
+      const counter = await CounterModel.create(req.body);
       return res.status(200).json({
         success: true,
         data: counter,
@@ -35,7 +36,7 @@ module.exports = {
   },
   updateCounter: async (req, res) => {
     try {
-      const counter = await CouterModel.findByIdAndUpdate(
+      const counter = await CounterModel.findByIdAndUpdate(
         req.params.id,
         req.body ,
         { new: true },
@@ -55,7 +56,7 @@ module.exports = {
   },
   deleteCounter: async (req, res) => {
     try {
-      const counter = await CouterModel.findByIdAndDelete(req.params.id);
+      const counter = await CounterModel.findByIdAndDelete(req.params.id);
       return res.status(200).json({
         success: true,
         data: counter,
@@ -71,7 +72,7 @@ module.exports = {
   },
   updateCounterStatus: async (req, res) => {
     try {
-      const counter = await CouterModel.findByIdAndUpdate(
+      const counter = await CounterModel.findByIdAndUpdate(
         req.params.id,
         req.body,
         { new: true },

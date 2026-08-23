@@ -1,4 +1,5 @@
 const HeroBannerModel = require("../heroBanner/model/HeroBannerModel");
+const CounterModel = require("../ManpowerCount/model/CounterModel");
 const MemberModel = require("../member/model/MemberModel");
 const UnitModel = require("../unit/model/UnitModel");
 const WardModel = require("../ward/model/WardModel");
@@ -9,28 +10,20 @@ module.exports = {
       const heroBannerList = await HeroBannerModel.find({
         status: true,
       })
+        .select("-__v -_id")
         .sort({ createdAt: -1 })
         .exec();
 
-      const member = await MemberModel.find({
-        organizationalValue: "Member",
-      }).countDocuments();
-
-      const ward = await WardModel.countDocuments({
-        status: true,
-      });
-
-      const unit = await UnitModel.countDocuments({
-        status: true,
-      });
+      const sbnsCounter = await CounterModel.findOne({})
+        .sort({ createdAt: -1 })
+        .select("-__v -_id")
+        .exec();
 
       return res.status(200).json({
         success: true,
         data: {
           heroBannerList,
-          member,
-          ward,
-          unit,
+          sbnsCounter,
         },
       });
     } catch (error) {
