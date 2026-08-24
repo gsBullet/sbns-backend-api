@@ -17,6 +17,7 @@ const BlogRouter = require("./blogManagement/blog/router/BlogRouter");
 const HeroBannerRouter = require("./heroBanner/router/HeroBannerRouter");
 const FrontViewRouter = require("./website/FrontViewRouter");
 const CounterRouter = require("./ManpowerCount/Router/CounterRouter");
+const MartyredLeadersRouter = require("./martyredleaders/router/MartyredLeadersRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -35,5 +36,6 @@ router.use("/blog", BlogRouter());
 router.use("/hero-banner", HeroBannerRouter());
 router.use("/sbns-counter", CounterRouter());
 router.use("/front-view", FrontViewRouter())
+router.use("/our-hero",MartyredLeadersRouter());
 
 module.exports = () => router;
