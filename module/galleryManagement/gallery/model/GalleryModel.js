@@ -25,6 +25,10 @@ const GallerySchema = new mongoose.Schema(
       enum: [true, false],
       default: false,
     },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
     status: {
       type: Boolean,
       enum: [true, false],

@@ -1,8 +1,8 @@
+const GalleryModel = require("../galleryManagement/gallery/model/GalleryModel");
 const HeroBannerModel = require("../heroBanner/model/HeroBannerModel");
 const CounterModel = require("../ManpowerCount/model/CounterModel");
+const MartyredLeaderModel = require("../martyredleaders/model/MartyredLeaderModel");
 const MemberModel = require("../member/model/MemberModel");
-const UnitModel = require("../unit/model/UnitModel");
-const WardModel = require("../ward/model/WardModel");
 
 module.exports = {
   heroBannerList: async (req, res) => {
@@ -31,6 +31,55 @@ module.exports = {
 
       return res.status(400).json({
         success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
+  ourHeroList: async (req, res) => {
+    try {
+      const ourHeroList = await MartyredLeaderModel.find({
+        status: true,
+      })
+        .select("-__v -_id")
+        .sort({ createdAt: -1 })
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        data: ourHeroList,
+      });
+    } catch (error) {
+      console.log(error);
+
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
+  imageGalleryList: async (req, res) => {
+    try {
+      const imageGalleryList = await GalleryModel.find({
+        status: true,
+      })
+        .populate("category")
+        .limit(9)
+        .select("-__v -_id")
+        .sort({ createdAt: -1 })
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        data: imageGalleryList,
+      });
+    } catch (error) {
+      console.log(error);
+
+      return res.status(400).json({
+        success: false,
+        error,
         error: error.message,
       });
     }

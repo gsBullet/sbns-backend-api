@@ -8,7 +8,7 @@ const fs = require("fs");
 module.exports = {
   createGalleryImage: async (req, res) => {
     try {
-      const { caption, description, category, isFeatured } = req.body;
+      const { caption, description, category, isFeatured, date } = req.body;
 
       let image = [];
 
@@ -22,6 +22,7 @@ module.exports = {
         caption,
         category,
         description,
+        date,
         image,
         isFeatured,
       });
@@ -138,7 +139,7 @@ module.exports = {
     let newImagePath = null; // only set if a new file was actually uploaded
 
     try {
-      const { caption, description, category, isFeatured } = req.body;
+      const { caption, description, category, isFeatured , date} = req.body;
 
       const gallery = await GalleryModel.findById(req.params.id);
       if (!gallery) {
@@ -163,6 +164,7 @@ module.exports = {
         caption,
         category,
         description,
+        date,
         image: finalImagePath,
         isFeatured,
       });
