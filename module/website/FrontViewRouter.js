@@ -6,6 +6,7 @@ const FrontViewController = require("./FrontViewController");
 router.get("/hero-banner-list",  FrontViewController.heroBannerList);
 router.get("/our-hero-list",  FrontViewController.ourHeroList);
 router.get("/image-gallery-list", FrontViewController.imageGalleryList);
+router.get("/video-gallery-list", FrontViewController.videoGalleryList);
 // router.post("/update-website/:id", protect, FrontViewController.updateWebsite);
 // router.delete("/delete-website/:id", protect, FrontViewController.deleteWebsite);
 // router.post(

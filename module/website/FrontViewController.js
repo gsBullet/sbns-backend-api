@@ -3,6 +3,7 @@ const HeroBannerModel = require("../heroBanner/model/HeroBannerModel");
 const CounterModel = require("../ManpowerCount/model/CounterModel");
 const MartyredLeaderModel = require("../martyredleaders/model/MartyredLeaderModel");
 const MemberModel = require("../member/model/MemberModel");
+const VideoModel = require("../videoManagement/video/model/VideoModel");
 
 module.exports = {
   heroBannerList: async (req, res) => {
@@ -77,6 +78,31 @@ module.exports = {
     } catch (error) {
       console.log(error);
 
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
+  videoGalleryList: async (req, res) => {
+    try {
+      const videoGalleryList = await VideoModel.find({
+        status: true,
+      })
+        .populate("videoCategory")
+        .limit(6)
+        .select("-__v -_id")
+        .sort({ createdAt: -1 })
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        message: "Video gallery fetched successfully",
+        data: videoGalleryList,
+      });
+    } catch (error) {
+      console.log(error);
       return res.status(400).json({
         success: false,
         error,

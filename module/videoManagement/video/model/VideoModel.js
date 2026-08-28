@@ -31,6 +31,10 @@ const videoSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    videoDate: {
+      type: Date,
+      required: true,
+    },
     status: {
       type: Boolean,
       enum: [true, false],

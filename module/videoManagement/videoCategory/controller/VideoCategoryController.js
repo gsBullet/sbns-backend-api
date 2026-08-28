@@ -3,7 +3,7 @@ const VideoCategoryModel = require("../model/VideoCategoryModel");
 module.exports = {
   getAllVideoCategories: async (req, res) => {
     try {
-      const videoCategories = await VideoCategoryModel.find();
+      const videoCategories = await VideoCategoryModel.find().sort({ createdAt: -1 });
       return res.status(200).json({
         success: true,
         data: videoCategories,

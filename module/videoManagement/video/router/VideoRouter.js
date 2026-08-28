@@ -12,6 +12,7 @@ router.post(
     protect,
     VideoController.updateVideoStatus,
 );
+router.post("/update-video-featured-status/:id", protect, VideoController.updateVideoFeaturedStatus);
 router.get("/video-category/list", protect, VideoController.getAllVideoCategory);
 
 module.exports = () => router;

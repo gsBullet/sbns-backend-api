@@ -56,14 +56,15 @@ module.exports = {
     }
   },
   createVideo: async (req, res) => {
+    console.log(req.body);
     try {
-      const { videoUrl, videoId, caption, author, videoCategory, isFeatured } =
+      const { videoUrl, videoId, caption, author, videoCategory, isFeatured,videoDate } =
         req.body;
 
-      if (!videoUrl || !videoId || !caption || !author || !videoCategory) {
+      if (!videoUrl || !videoId || !caption || !author || !videoCategory, !videoDate) {
         return res.status(400).json({
           success: false,
-          error:
+          message:
             "videoUrl, videoId, caption, author, and videoCategory are required",
         });
       }
@@ -82,13 +83,18 @@ module.exports = {
           .json({ success: false, error: "This video has already been added" });
       }
 
+          const featured =
+      isFeatured === true ||
+      isFeatured === "true";
+
       const video = await VideoModel.create({
         videoUrl: videoUrl.trim(),
         videoId: videoId.trim(),
         caption: caption.trim(),
         author: author.trim(),
         videoCategory,
-        isFeatured: Boolean(isFeatured),
+        isFeatured: featured,
+        videoDate
       });
 
       const populated = await video.populate("videoCategory", "categoryName");
@@ -96,7 +102,9 @@ module.exports = {
       return res.status(201).json({ success: true, data: populated });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ success: false, error: error.message });
+      return res
+        .status(400)
+        .json({ success: false, error, message: error.message });
     }
   },
 
@@ -109,10 +117,11 @@ module.exports = {
           .json({ success: false, error: "Invalid video id" });
       }
 
-      const { videoUrl, videoId, caption, author, videoCategory, isFeatured } =
+      const { videoUrl, videoId, caption, author, videoCategory, isFeatured, videoDate } =
         req.body;
 
-      if (!videoUrl || !videoId || !caption || !author || !videoCategory) {
+       
+      if (!videoUrl || !videoId || !caption || !author || !videoCategory || !videoDate) {
         return res.status(400).json({
           success: false,
           error:
@@ -138,6 +147,10 @@ module.exports = {
         });
       }
 
+    const  featured =
+        isFeatured === true ||
+        isFeatured === "true";
+
       const updated = await VideoModel.findByIdAndUpdate(
         id,
         {
@@ -146,10 +159,11 @@ module.exports = {
           caption: caption.trim(),
           author: author.trim(),
           videoCategory,
-          isFeatured: Boolean(isFeatured),
+          isFeatured: featured,
+          videoDate
         },
         { new: true, runValidators: true },
-      ).populate("videoCategory", "name");
+      ).populate("videoCategory");
 
       if (!updated) {
         return res
@@ -160,7 +174,7 @@ module.exports = {
       return res.status(200).json({ success: true, data: updated });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ success: false, error: error.message });
+      return res.status(400).json({ success: false,error,error: error.message });
     }
   },
 
@@ -198,30 +212,48 @@ module.exports = {
           .json({ success: false, error: "Invalid video id" });
       }
 
-      const video = await VideoModel.findById(id);
+      const video = await VideoModel.findByIdAndUpdate(
+        id,
+        { status: req.body.status },
+        { new: true },
+      );
       if (!video) {
         return res
           .status(404)
           .json({ success: false, error: "Video not found" });
       }
 
-      // Toggle if no explicit status is sent; otherwise use the sent boolean
-      const nextStatus =
-        typeof req.body.status === "boolean" ? req.body.status : !video.status;
-
-      video.status = nextStatus;
-      await video.save();
-
+      return res.status(200).json({
+        success: true,
+        data: video,
+        message: "Video status updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({ success: false, error: error.message });
+    }
+  },
+  updateVideoFeaturedStatus: async (req, res) => {
+    // console.log(req.body);
+    
+    try {
+      const response = await VideoModel.findByIdAndUpdate(
+        req.params.id,
+        { isFeatured: req.body.isFeatured },
+        { new: true },
+      );
       return res
         .status(200)
         .json({
           success: true,
-          data: video,
-          message: "Video status updated successfully",
+          data: response,
+          message: "Video Featured status updated successfully",
         });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ success: false, error: error.message });
+      return res
+        .status(400)
+        .json({ success: false, error, message: error.message });
     }
   },
   getAllVideoCategory: async (req, res) => {
