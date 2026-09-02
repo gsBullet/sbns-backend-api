@@ -25,7 +25,8 @@ router.post(
   "/create",
   protect,
   // restrictTo("admin"),
-  validateGalleryCreation,
+  // validateGalleryCreation,
+
   createGalleryImage,
 );
 

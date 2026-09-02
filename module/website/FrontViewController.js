@@ -85,14 +85,63 @@ module.exports = {
       });
     }
   },
+  imageGalleryListPage: async (req, res) => {
+    try {
+      const imageGalleryList = await GalleryModel.find({
+        status: true,
+      })
+        .populate("category")
+        .select("-__v ")
+        .sort({ createdAt: -1 })
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        data: imageGalleryList,
+      });
+    } catch (error) {
+      console.log(error);
+
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
+
   videoGalleryList: async (req, res) => {
     try {
       const videoGalleryList = await VideoModel.find({
         status: true,
       })
         .populate("videoCategory")
+        .select("-__v")
+        .sort({ createdAt: -1 })
         .limit(6)
-        .select("-__v -_id")
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        message: "Video gallery fetched successfully",
+        data: videoGalleryList,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
+  videoGalleryListPage: async (req, res) => {
+    try {
+      const videoGalleryList = await VideoModel.find({
+        status: true,
+      })
+        .populate("videoCategory")
+        .select("-__v")
         .sort({ createdAt: -1 })
         .exec();
 

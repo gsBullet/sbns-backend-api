@@ -7,6 +7,9 @@ const fs = require("fs");
 
 module.exports = {
   createGalleryImage: async (req, res) => {
+    console.log(`req.body`, req.body);
+    console.log(`req.file`, req.file);
+
     try {
       const { caption, description, category, isFeatured, date } = req.body;
 

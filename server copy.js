@@ -54,6 +54,15 @@ app.use(cookieParser());
 
 app.set("json spaces", 4);
 
+app.use(express.json({ limit: "10mb" }));
+
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "2mb",
+  })
+);
+
 /* ─── Static files ───────────────────────────────────────────── */
 app.use(
   "/uploads",
@@ -71,16 +80,6 @@ app.get("/api/health", (req, res) =>
     success: true,
     message: "Server is running 🚀",
     env: process.env.NODE_ENV,
-  })
-);
-
-/* ─── IMPORTANT: Body parsers AFTER static files ────────────── */
-// These should come AFTER static files but BEFORE routes
-app.use(express.json({ limit: "10mb" }));
-app.use(
-  express.urlencoded({
-    extended: true,
-    limit: "2mb",
   })
 );
 
