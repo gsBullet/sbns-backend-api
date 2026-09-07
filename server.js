@@ -5,8 +5,11 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
-
+const app = express();
 const path = require("path");
+const formData = require("express-form-data");
+const bodyParser = require("body-parser");
+app.use(formData.parse());
 
 const connectDB = require("./config/db");
 const errorHandler = require("./middlewares/errorHandler");
@@ -16,7 +19,14 @@ const AllRouter = require("./module/All.Router");
 /* ─── Connect DB ─────────────────────────────────────────────── */
 connectDB();
 
-const app = express();
+
+app.use(bodyParser.json());
+app.use(formData.parse());
+app.use(
+  bodyParser.urlencoded({
+    extended: false,
+  })
+);
 
 /* ─── Security middlewares ───────────────────────────────────── */
 app.use(
@@ -54,6 +64,15 @@ app.use(cookieParser());
 
 app.set("json spaces", 4);
 
+app.use(express.json({ limit: "10mb" }));
+
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "2mb",
+  })
+);
+
 /* ─── Static files ───────────────────────────────────────────── */
 app.use(
   "/uploads",
@@ -71,16 +90,6 @@ app.get("/api/health", (req, res) =>
     success: true,
     message: "Server is running 🚀",
     env: process.env.NODE_ENV,
-  })
-);
-
-/* ─── IMPORTANT: Body parsers AFTER static files ────────────── */
-// These should come AFTER static files but BEFORE routes
-app.use(express.json({ limit: "10mb" }));
-app.use(
-  express.urlencoded({
-    extended: true,
-    limit: "2mb",
   })
 );
 
