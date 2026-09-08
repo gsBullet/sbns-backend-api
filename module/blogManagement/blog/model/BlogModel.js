@@ -74,6 +74,11 @@ const blogSchema = new Schema(
       enum: [true, false],
       default: false,
     },
+    isFeatured: {
+      type: Boolean,
+      enum: [true, false],
+      default: false,
+    },
 
     views: {
       type: Number,

@@ -1,3 +1,4 @@
+const BlogModel = require("../blogManagement/blog/model/BlogModel");
 const GalleryModel = require("../galleryManagement/gallery/model/GalleryModel");
 const HeroBannerModel = require("../heroBanner/model/HeroBannerModel");
 const CounterModel = require("../ManpowerCount/model/CounterModel");
@@ -149,6 +150,57 @@ module.exports = {
         success: true,
         message: "Video gallery fetched successfully",
         data: videoGalleryList,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
+  blogList: async (req, res) => {
+    try {
+      const blogList = await BlogModel.find({
+        status: true,
+      })
+        .populate("categories")
+        .populate("author")
+        .select("-__v")
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog list fetched successfully",
+        data: blogList,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
+  blogListPage: async (req, res) => {
+    try {
+      const blogList = await BlogModel.find({
+        status: true,
+      })
+        .populate("categories")
+        .populate("author")
+        .select("-__v")
+        .sort({ createdAt: -1 })
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog list fetched successfully",
+        data: blogList,
       });
     } catch (error) {
       console.log(error);

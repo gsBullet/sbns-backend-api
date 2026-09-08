@@ -531,6 +531,38 @@ const updatePublishDraftStatus = async (req, res) => {
   }
 };
 
+const updateBlogFeaturedStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isFeatured } = req.body;
+
+    const updatedBlog = await BlogModel.findByIdAndUpdate(
+      id,
+      { isFeatured },
+      { new: true }
+    );
+
+    if (!updatedBlog) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Blog not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog status updated successfully!",
+      data: updatedBlog,
+    });
+  } catch (error) {
+    console.error("updateBlogStatus error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update blog status",
+      error: error.message,
+    });
+  } 
+};
+
 module.exports = {
   createBlog,
   getAllBlogs,
@@ -543,4 +575,5 @@ module.exports = {
   uploadThumbnailByCoverImage,
   isPublishedBlog,
   updatePublishDraftStatus,
+  updateBlogFeaturedStatus
 };

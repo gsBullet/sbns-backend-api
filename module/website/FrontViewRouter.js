@@ -10,13 +10,10 @@ router.get("/video-gallery-list", FrontViewController.videoGalleryList);
 router.get("/image-gallery-list-for-page", FrontViewController.imageGalleryListPage);
 router.get("/video-gallery-list-for-page", FrontViewController.videoGalleryListPage);
 
+router.get("/blog-list", FrontViewController.blogList);
+router.get("/blog-list-for-page", FrontViewController.blogListPage);
 
-// router.post("/update-website/:id", protect, FrontViewController.updateWebsite);
-// router.delete("/delete-website/:id", protect, FrontViewController.deleteWebsite);
-// router.post(
-//     "/update-website-status/:id",
-//     protect,
-//     FrontViewController.updateWebsiteStatus,
-// );
+
+
 
 module.exports =()=> router
