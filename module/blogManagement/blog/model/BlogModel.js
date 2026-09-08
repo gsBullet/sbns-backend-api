@@ -19,6 +19,13 @@ const blogSchema = new Schema(
       minlength: 3,
       maxlength: 200,
     },
+    shortDescription: {
+      type: String,
+      required: [true, "Short description is required"],
+      trim: true,
+      minlength: 3,
+      maxlength: 500,
+    },
 
     slug: {
       type: String,

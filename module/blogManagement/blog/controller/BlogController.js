@@ -62,7 +62,7 @@ const uploadThumbnailByCoverImage = async (req, res) => {
 const createBlog = async (req, res) => {
   // console.log("createBlog called with body:", req.body);
   try {
-    const { title, thumbnail } = req.body;
+    const { title, thumbnail, shortDescription } = req.body;
     const categories = parseIfString(req.body.categories, []);
     const tags = parseIfString(req.body.tags, []);
     const content = parseIfString(req.body.content, null);
@@ -96,7 +96,7 @@ const createBlog = async (req, res) => {
     }
 
     const slug = await generateUniqueSlug(title);
-    console.log(slug);
+    // console.log(slug);
     
 
     const blog = await BlogModel.create({
@@ -106,6 +106,7 @@ const createBlog = async (req, res) => {
       categories,
       tags,
       content,
+      shortDescription,
       isDraft : isDraft ? true : false,
       author: req.user?._id, // set by your auth middleware, if present
     });
@@ -277,6 +278,10 @@ const updateBlog = async (req, res) => {
     if (req.body.title && req.body.title.trim()) {
       updates.title = req.body.title.trim();
       updates.slug = await generateUniqueSlug(req.body.title, id);
+    }
+
+    if (req.body.shortDescription) {
+      updates.shortDescription = req.body.shortDescription;
     }
 
     if (req.body.categories !== undefined) {
