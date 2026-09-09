@@ -12,6 +12,7 @@ router.get("/video-gallery-list-for-page", FrontViewController.videoGalleryListP
 
 router.get("/blog-list", FrontViewController.blogList);
 router.get("/blog-list-for-page", FrontViewController.blogListPage);
+router.get("/blog-for-read/:id", FrontViewController.blogForRead);
 
 
 

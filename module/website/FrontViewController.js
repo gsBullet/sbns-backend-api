@@ -211,4 +211,31 @@ module.exports = {
       });
     }
   },
+
+  blogForRead: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const blog = await BlogModel.findOne({
+        _id: id,
+        status: true,
+      })
+        .populate("categories")
+        .populate("author")
+        .select("-__v")
+        .exec();
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog fetched successfully",
+        data: blog,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
 };
