@@ -188,19 +188,47 @@ module.exports = {
   },
   blogListPage: async (req, res) => {
     try {
+      const { page = 1, limit = 10, search, category } = req.query;
       const blogList = await BlogModel.find({
         status: true,
+        ...(search && { title: { $regex: search, $options: "i" } }),
+        ...(category && { categories: { $in: category } }),
       })
         .populate("categories")
         .populate("author")
         .select("-__v")
         .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
+
+      const total = await BlogModel.find({
+        status: true,
+        ...(search && { title: { $regex: search, $options: "i" } }),
+        ...(category && { categories: { $in: category } }),
+      }).countDocuments();
+
+      const featuredBlogList = await BlogModel.findOne({
+        status: true,
+        isFeatured: true,
+        ...(search && { title: { $regex: search, $options: "i" } }),
+        ...(category && { categories: { $in: category } }),
+      })
+        .populate("categories")
+        .populate("author")
+        .select("-__v")
+        .sort({ createdAt: -1 })
+        .limit(1)
         .exec();
 
       return res.status(200).json({
         success: true,
         message: "Blog list fetched successfully",
-        data: blogList,
+        data: { blogs: blogList, featured: featuredBlogList },
+        total,
+        page,
+        limit,
+        totalPage: Math.ceil(total / limit),
       });
     } catch (error) {
       console.log(error);
@@ -235,6 +263,63 @@ module.exports = {
         success: false,
         error,
         error: error.message,
+      });
+    }
+  },
+
+  blogCategoriesForFrontView: async (req, res) => {
+    try {
+      const categories = await BlogModel.aggregate([
+        // categories array থেকে প্রতিটি category আলাদা করা
+        {
+          $unwind: "$categories",
+        },
+
+        // Category collection থেকে category information আনা
+        {
+          $lookup: {
+            from: "blogcategories",
+            localField: "categories",
+            foreignField: "_id",
+            as: "categoryInfo",
+          },
+        },
+
+        {
+          $unwind: "$categoryInfo",
+        },
+
+        // একই category অনুযায়ী count
+        {
+          $group: {
+            _id: "$categories",
+            blogCategoryName: {
+              $first: "$categoryInfo.blogCategoryName",
+            },
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+      ]);
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog categories fetched successfully",
+        data: categories,
+      });
+    } catch (error) {
+      console.log(error);
+
+      return res.status(400).json({
+        success: false,
+        message: error.message,
       });
     }
   },
