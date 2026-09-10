@@ -323,4 +323,45 @@ module.exports = {
       });
     }
   },
+
+  categoryWiseBlogListPage: async (req, res) => {
+    try {
+      const { page = 1, limit = 10, search, category } = req.query;
+      const blogList = await BlogModel.find({
+        status: true,
+        ...(search && { title: { $regex: search, $options: "i" } }),
+        ...(category && { categories: { $in: category } }),
+      })
+        .populate("categories")
+        .populate("author")
+        .select("-__v")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
+
+      const total = await BlogModel.find({
+        status: true,
+        ...(search && { title: { $regex: search, $options: "i" } }),
+        ...(category && { categories: { $in: category } }),
+      }).countDocuments();
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog list fetched successfully",
+        data: blogList,
+        total,
+        page,
+        limit,
+        totalPage: Math.ceil(total / limit),
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        success: false,
+        error,
+        error: error.message,
+      });
+    }
+  },
 };
