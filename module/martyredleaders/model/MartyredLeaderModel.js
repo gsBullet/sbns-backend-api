@@ -4,26 +4,23 @@ const MartyredLeadersSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "নাম আবশ্যক"],
+      required: true,
       trim: true,
-      maxlength: [120, "নাম সর্বোচ্চ ১২০ ক্যারেক্টার হতে পারবে"],
     },
     role: {
       type: String,
-      required: [true, "পদবি/দায়িত্ব আবশ্যক"],
+      required: true,
       trim: true,
-      maxlength: [150, "পদবি সর্বোচ্চ ১৫০ ক্যারেক্টার হতে পারবে"],
     },
     initial: {
       type: String,
       trim: true,
-      maxlength: [3, "ইনিশিয়াল সর্বোচ্চ ৩ ক্যারেক্টার হতে পারবে"],
-      // auto-generated from name if not provided — see pre-save hook below
+      required: true,
+      maxlength: 3,
     },
     bio: {
       type: String,
       trim: true,
-      maxlength: [1000, "বায়ো সর্বোচ্চ ১০০০ ক্যারেক্টার হতে পারবে"],
       default: "",
     },
     tags: {

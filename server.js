@@ -5,11 +5,9 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
+
 const app = express();
 const path = require("path");
-const formData = require("express-form-data");
-const bodyParser = require("body-parser");
-app.use(formData.parse());
 
 const connectDB = require("./config/db");
 const errorHandler = require("./middlewares/errorHandler");
@@ -19,16 +17,7 @@ const AllRouter = require("./module/All.Router");
 /* ─── Connect DB ─────────────────────────────────────────────── */
 connectDB();
 
-
-app.use(bodyParser.json());
-app.use(formData.parse());
-app.use(
-  bodyParser.urlencoded({
-    extended: false,
-  })
-);
-
-/* ─── Security middlewares ───────────────────────────────────── */
+/* ─── Security ───────────────────────────────────────────────── */
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5000",
@@ -38,9 +27,7 @@ app.use(
 
 app.use(
   helmet({
-    crossOriginResourcePolicy: {
-      policy: "cross-origin",
-    },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
 
@@ -59,27 +46,19 @@ app.use(
   })
 );
 
-/* ─── General middlewares ────────────────────────────────────── */
+/* ─── General ────────────────────────────────────────────────── */
 app.use(cookieParser());
-
 app.set("json spaces", 4);
 
+// ONE json parser, ONE urlencoded parser — both skip multipart automatically.
+// Multer handles multipart exclusively, per-route. ✅
 app.use(express.json({ limit: "10mb" }));
-
-app.use(
-  express.urlencoded({
-    extended: true,
-    limit: "2mb",
-  })
-);
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
 /* ─── Static files ───────────────────────────────────────────── */
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
-);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-/* ─── Development logger ─────────────────────────────────────── */
+/* ─── Logger ─────────────────────────────────────────────────── */
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
@@ -93,35 +72,26 @@ app.get("/api/health", (req, res) =>
   })
 );
 
-/* ─── API Routes ─────────────────────────────────────────────── */
+/* ─── Routes ─────────────────────────────────────────────────── */
 app.use("/api", AllRouter());
 
-/* ─── 404 handler ────────────────────────────────────────────── */
+/* ─── 404 ────────────────────────────────────────────────────── */
 app.all("*", (req, res, next) => {
-  next(
-    new AppError(
-      `রুটটি পাওয়া যায়নি: ${req.method} ${req.originalUrl}`,
-      404
-    )
-  );
+  next(new AppError(`রুটটি পাওয়া যায়নি: ${req.method} ${req.originalUrl}`, 404));
 });
 
-/* ─── Global error handler ───────────────────────────────────── */
+/* ─── Error handler ──────────────────────────────────────────── */
 app.use(errorHandler);
 
-/* ─── Start server ───────────────────────────────────────────── */
+/* ─── Start ──────────────────────────────────────────────────── */
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
-  console.log(
-    `🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
-  );
+  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 
-/* ─── Unhandled rejection ────────────────────────────────────── */
 process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION 💥", err.name, err.message);
-
   server.close(() => process.exit(1));
 });
 

@@ -3,6 +3,35 @@ const MemberModel = require("../model/MemberModel");
 const path = require("path");
 const fs = require("fs");
 
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000/";
+
+// Helper: build a public URL for an uploaded file
+const toPublicUrl = (subfolder, filename) =>
+  `${BACKEND_URL.replace(/\/+$/, "")}/uploads/${subfolder}/${filename}`;
+
+const parseIfString = (value, fallback) => {
+  if (value === undefined || value === null) return fallback;
+  if (typeof value === "object") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+};
+
+// Helper: remove an uploaded file from disk (used on failure / delete / replace)
+const removeFileByUrl = (url) => {
+  if (!url) return;
+  try {
+    const relative = url.split("/uploads/")[1]; // "thumbnails/xxx.png"
+    if (!relative) return;
+    const filePath = path.join(__dirname, "..", "uploads", relative);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  } catch (err) {
+    console.error("Failed to remove file:", err.message);
+  }
+};
+
 module.exports = {
   createMember: async (req, res, next) => {
     try {
@@ -15,13 +44,6 @@ module.exports = {
         responsibilities,
         organizationalValue,
       } = req.body;
-      let image = [];
-
-      // Process image
-      if (req.files?.image) {
-        image = uploadFile(req.files.image, "uploads");
-        console.log("image saved at:", image);
-      }
 
       const newMember = new MemberModel({
         name,
@@ -31,20 +53,22 @@ module.exports = {
         profession,
         responsibilities,
         organizationalValue,
-        image: image,
+        image: toPublicUrl("members",req.file.filename),
       });
 
       const savedMember = await newMember.save();
       return res.status(201).json({
         success: true,
-        message: "সদস্য সফলভাবে তৈরি হয়েছে",
+        message: "Member created successfully",
         member: savedMember,
       });
     } catch (error) {
+      removeFileByUrl();
+
       console.error("Error creating:", error);
       return res.status(500).json({
         success: false,
-        message: "সদস্য তৈরি হয়নি",
+        message: "Failed to create member",
         error: error.message,
       });
     }
@@ -75,7 +99,7 @@ module.exports = {
         .populate("responsibilities")
         .select("-__v"); // Exclude the __v field
       if (!member) {
-        return res.status(404).json({ message: "সদস্য পাওয়া যায়নি" });
+        return res.status(404).json({ message: "No member found with that ID" });
       }
       return res.status(200).json({
         success: true,
@@ -90,7 +114,7 @@ module.exports = {
   },
 
   updateMember: async (req, res, next) => {
-    let image; // ✅ declared in function scope, accessible in catch
+   
     try {
       const {
         name,
@@ -104,18 +128,10 @@ module.exports = {
 
       const existingMember = await MemberModel.findById(req.params.id);
       if (!existingMember) {
-        return res.status(404).json({ message: "সদস্য পাওয়া যায়নি" });
+        return res.status(404).json({ message: "No member found with that ID" });
       }
 
-      image = existingMember.image; // no `let` here anymore
-
-      if (req.files?.image) {
-        if (existingMember.image) {
-          const oldImagePath = path.join(__dirname, "..", existingMember.image);
-          if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
-        }
-        image = uploadFile(req.files.image, "uploads");
-      }
+    
 
       let parsedResponsibilities = [];
       try {
@@ -136,22 +152,19 @@ module.exports = {
           profession,
           responsibilities: parsedResponsibilities,
           organizationalValue,
-          image,
+          image: req.file? toPublicUrl("members", req.file.filename) : existingMember.image,
         },
         { new: true },
       );
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "সদস্য সফলভাবে আপডেট হয়েছে",
-          member: updatedMember,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Member updated successfully",
+        member: updatedMember,
+      });
     } catch (error) {
-      if (req.files?.image && image) {
-        const newImagePath = path.join(__dirname, "..", image);
-        if (fs.existsSync(newImagePath)) fs.unlinkSync(newImagePath);
+      if (req.file) {
+        removeFileByUrl(toPublicUrl("members", req.file.filename));
       }
       return res.status(500).json({ success: false, error: error.message });
     }
@@ -161,23 +174,11 @@ module.exports = {
       const member = await MemberModel.findById(req.params.id);
 
       if (!member) {
-        return res.status(404).json({ message: "সদস্য পাওয়া যায়নি" });
+        return res.status(404).json({ message: "Member not found" });
       }
 
-      // Delete image if exists
       if (member.image) {
-        const imagePath = path.join(__dirname, "..", member.image);
-        if (fs.existsSync(imagePath)) {
-          try {
-            fs.unlinkSync(imagePath);
-            console.log("Image deleted successfully:", member.image);
-          } catch (unlinkError) {
-            console.error("Failed to delete image:", unlinkError.message);
-            // Continue with member deletion even if image deletion fails
-          }
-        } else {
-          console.log("Image file not found:", member.image);
-        }
+        removeFileByUrl(member.image);
       }
 
       // Delete the member
@@ -185,7 +186,7 @@ module.exports = {
 
       return res.status(200).json({
         success: true,
-        message: "সদস্য সফলভাবে ডিলিট হয়েছে",
+        message: "Member deleted successfully",
       });
     } catch (error) {
       console.error("Delete member error:", error);

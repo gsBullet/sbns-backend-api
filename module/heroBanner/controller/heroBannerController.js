@@ -76,7 +76,7 @@ exports.getHeroBannerById = async (req, res) => {
 
 // ── POST /hero-banners ──
 exports.createHeroBanner = async (req, res) => {
-    console.log(req.file);
+    console.log(req.body);
     
   try {
     const { badge, title, highlight, titleEnd, desc, tags } = req.body;

@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const BlogModel = require("../model/BlogModel");
 const BlogCategoryModel = require("../../blogCategory/model/BlogCategoryModel");
 const { generateUniqueSlug } = require("../utils/Slugify");
-const { uploadFile } = require("../../../../middlewares/UploadThumbnails");
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000/";
 
@@ -37,16 +36,14 @@ const removeFileByUrl = (url) => {
 
 const uploadThumbnailByCoverImage = async (req, res) => {
   try {
-    let thumbnail = [];
-
-    // Process image
-    if (req.files?.thumbnail) {
-      thumbnail = uploadFile(req.files.thumbnail, "uploads/thumbnails");
-      console.log("thumbnail saved at:", thumbnail);
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No thumbnail file provided" });
     }
     return res.status(200).json({
       success: true,
-      data: thumbnail,
+      data:  toPublicUrl("blog-thumbnails", req.file.filename),
       message: "Thumbnail uploaded successfully",
     });
   } catch (error) {
@@ -119,7 +116,7 @@ const createBlog = async (req, res) => {
   } catch (error) {
     // Clean up the orphaned thumbnail if DB insert failed
     if (req.files?.thumbnail)
-     await removeFileByUrl(toPublicUrl("thumbnails", req.files.thumbnail.filename));
+      removeFileByUrl(toPublicUrl("thumbnails", req.files.thumbnail.filename));
     console.error("createBlog error:", error);
     return res.status(500).json({
       success: false,

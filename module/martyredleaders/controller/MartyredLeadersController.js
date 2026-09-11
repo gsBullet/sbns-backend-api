@@ -42,7 +42,12 @@ module.exports = {
   },
 
   createOurHero: async (req, res) => {
+    console.log(req.body);
+    console.log(req.file);
+    
     const { initial, name, role, bio, tags, order } = req.body;
+
+
     try {
       const newOurHero = await MartyredLeaderModel.create({
         initial,

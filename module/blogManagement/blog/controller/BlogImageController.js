@@ -1,19 +1,16 @@
-const { uploadFile } = require("../../../../middlewares/updloadHandler");
-
+const buildImageUrl = (req, filename) =>
+  `${req.protocol}://${req.get("host")}/uploads/blogs/${filename}`;
 exports.uploadImage = async (req, res) => {
-  try {
-    let image = [];
 
-    // Process image
-    if (req.files?.image) {
-      image = uploadFile(req.files.image, "uploads");
-      console.log("image saved at:", image);
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No image file provided" });
     }
     return res
       .status(200)
       .json({
         success: true,
-        data: image,
+        data: buildImageUrl(req, req.file.filename),
         message: "Image uploaded successfully",
       });
   } catch (error) {
