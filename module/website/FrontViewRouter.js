@@ -15,6 +15,7 @@ router.get("/blog-list-for-page", FrontViewController.blogListPage);
 router.get("/blog-for-read/:id", FrontViewController.blogForRead);
 router.get("/blog-categories-for-front-view", FrontViewController.blogCategoriesForFrontView);
 router.get("/category-wise-blog-list-for-page", FrontViewController.categoryWiseBlogListPage);
+router.get("/news-letter-list", FrontViewController.newsLetterList);
 
 
 module.exports =()=> router

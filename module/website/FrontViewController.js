@@ -4,6 +4,7 @@ const HeroBannerModel = require("../heroBanner/model/HeroBannerModel");
 const CounterModel = require("../ManpowerCount/model/CounterModel");
 const MartyredLeaderModel = require("../martyredleaders/model/MartyredLeaderModel");
 const MemberModel = require("../member/model/MemberModel");
+const NewsLetterModel = require("../newsLetter/model/NewsLetterModel");
 const VideoModel = require("../videoManagement/video/model/VideoModel");
 
 module.exports = {
@@ -362,6 +363,14 @@ module.exports = {
         error,
         error: error.message,
       });
+    }
+  },
+  newsLetterList: async (req, res) => {
+    try {
+      const newsLetterList = await NewsLetterModel.find({status: true}).exec();
+      return res.status(200).json({ success: true, data: newsLetterList, message: "News letter list fetched successfully" });
+    } catch (error) {
+      return res.status(400).json({ success: false, message: error.message , error });
     }
   },
 };
