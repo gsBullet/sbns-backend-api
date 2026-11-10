@@ -19,6 +19,7 @@ const FrontViewRouter = require("./website/FrontViewRouter");
 const CounterRouter = require("./ManpowerCount/Router/CounterRouter");
 const MartyredLeadersRouter = require("./martyredleaders/router/MartyredLeadersRouter");
 const NewsLetterRouter = require("./newsLetter/router/NewsLetterRouter");
+const ThanaTeamRouter = require("./thana/router/ThanaTeamRouter");
 
 router.use("/user", UserRouter());
 router.use("/gallery", GalleryRouter());
@@ -39,5 +40,6 @@ router.use("/sbns-counter", CounterRouter());
 router.use("/front-view", FrontViewRouter())
 router.use("/our-hero",MartyredLeadersRouter());
 router.use("/newsletters", NewsLetterRouter());
+router.use("/thana-team", ThanaTeamRouter());
 
 module.exports = () => router;

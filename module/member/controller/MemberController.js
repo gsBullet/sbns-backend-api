@@ -77,7 +77,7 @@ module.exports = {
   getAllMembers: async (req, res, next) => {
     try {
       const members = await MemberModel.find()
-        .sort({ updatedAt: -1 })
+        .sort({ createdAt: -1 })
         .select("-__v")
         .populate("responsibilities")
         .exec();

@@ -1,6 +1,25 @@
+const MemberModel = require("../../member/model/MemberModel");
 const ThanaTeamModel = require("../model/ThanaTeamModel");
 
 module.exports = {
+  getMembersForThanaTeam: async (req, res) => {
+    try {
+      const members = await MemberModel.find({ status: true }).select(
+        "name  phone description image",
+      );
+      return res.status(200).json({
+        success: true,
+        data: members,
+        message: "Members for thana team fetched successfully",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        error: error.message,
+        message: "Failed to fetch members for thana team",
+      });
+    }
+  },
   createThanaTeam: async (req, res) => {
     try {
       const newThanaTeam = await ThanaTeamModel.create(req.body);

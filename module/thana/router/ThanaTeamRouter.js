@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const thanaController = require("../controller/ThanaController");
-const { protect } = require("../../../../middlewares/auth");
+const { protect } = require("../../../middlewares/auth");
 
+router.get("/members-for-thana-team/list", protect, thanaController.getMembersForThanaTeam);
 router.get("/list", protect, thanaController.getAllThanaTeams);
 router.post("/create", protect, thanaController.createThanaTeam);
 router.post("/update-thana-team/:id", protect, thanaController.updateThanaTeam);
@@ -12,4 +13,4 @@ router.post(
     protect,
     thanaController.updateThanaTeamStatus,
 );
-module.exports = router;
+module.exports =()=> router;
