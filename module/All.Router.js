@@ -37,9 +37,10 @@ router.use("/blog/blog-image", BlogImageRouter());
 router.use("/blog", BlogRouter());
 router.use("/hero-banner", HeroBannerRouter());
 router.use("/sbns-counter", CounterRouter());
-router.use("/front-view", FrontViewRouter())
 router.use("/our-hero",MartyredLeadersRouter());
 router.use("/newsletters", NewsLetterRouter());
 router.use("/thana-team", ThanaTeamRouter());
 
+// website routes 
+router.use("/front-view", FrontViewRouter());
 module.exports = () => router;

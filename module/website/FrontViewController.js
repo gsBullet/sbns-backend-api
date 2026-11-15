@@ -5,7 +5,29 @@ const CounterModel = require("../ManpowerCount/model/CounterModel");
 const MartyredLeaderModel = require("../martyredleaders/model/MartyredLeaderModel");
 const MemberModel = require("../member/model/MemberModel");
 const NewsLetterModel = require("../newsLetter/model/NewsLetterModel");
+const ThanaTeamModel = require("../thana/model/ThanaTeamModel");
 const VideoModel = require("../videoManagement/video/model/VideoModel");
+
+// ── Helpers ──────────────────────────────────────────────────
+const ROLE_LABELS = {
+  amir: "আমীর",
+  nayebeAmir: "নায়েবে আমীর",
+  secretary: "সেক্রেটারি",
+  officeSecretary: "অফিস সেক্রেটারি",
+  bm: "বায়তুলমাল সম্পাদক",
+  mediaSecretary: "মিডিয়া সম্পাদক",
+  teamMembers: "টিম সদস্য",
+};
+const ROLE_KEYS = Object.keys(ROLE_LABELS);
+
+// লিস্টে সদস্যের যে ফিল্ডগুলো দরকার (ফ্রন্টএন্ডের টেবিল ও View মডালের জন্য)
+const MEMBER_FIELDS = "name phone image presentAddress profession";
+
+// প্রতিটি পদের এন্ট্রি এখন { member, shortSpeech, bio }, তাই populate হয় "<পদ>.member" এ
+const TEAM_POPULATE = ROLE_KEYS.map((key) => ({
+  path: `${key}.member`,
+  select: MEMBER_FIELDS,
+}));
 
 module.exports = {
   heroBannerList: async (req, res) => {
@@ -367,10 +389,36 @@ module.exports = {
   },
   newsLetterList: async (req, res) => {
     try {
-      const newsLetterList = await NewsLetterModel.find({status: true}).exec();
-      return res.status(200).json({ success: true, data: newsLetterList, message: "News letter list fetched successfully" });
+      const newsLetterList = await NewsLetterModel.find({
+        status: true,
+      }).exec();
+      return res.status(200).json({
+        success: true,
+        data: newsLetterList,
+        message: "News letter list fetched successfully",
+      });
     } catch (error) {
-      return res.status(400).json({ success: false, message: error.message , error });
+      return res
+        .status(400)
+        .json({ success: false, message: error.message, error });
+    }
+  },
+  thanaTeamList: async (req, res) => {
+    try {
+      const thanaTeamList = await ThanaTeamModel.find({ status: true })
+        .populate(TEAM_POPULATE)
+        .select("-__v -_id")
+        .sort({ createdAt: -1 })
+        .exec();
+      return res.status(200).json({
+        success: true,
+        data: thanaTeamList,
+        message: "Thana team list fetched successfully",
+      });
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: error.message, error });
     }
   },
 };

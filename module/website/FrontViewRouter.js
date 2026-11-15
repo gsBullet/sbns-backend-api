@@ -16,6 +16,7 @@ router.get("/blog-for-read/:id", FrontViewController.blogForRead);
 router.get("/blog-categories-for-front-view", FrontViewController.blogCategoriesForFrontView);
 router.get("/category-wise-blog-list-for-page", FrontViewController.categoryWiseBlogListPage);
 router.get("/news-letter-list", FrontViewController.newsLetterList);
+router.get("/thana-team-list", FrontViewController.thanaTeamList);
 
 
 module.exports =()=> router
